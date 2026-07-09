@@ -1,0 +1,7 @@
+{
+  "app_id": "cli_你的AppID",
+  "app_secret": "你的AppSecret",
+  "receive_id": "你的union_id或user_id或open_id",
+  "receive_id_type": "union_id",
+  "enabled_events": ["Notification", "Stop", "SubagentStop"]
+}

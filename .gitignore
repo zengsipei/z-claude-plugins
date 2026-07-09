@@ -1,0 +1,9 @@
+# 飞书通知密钥（含真实凭据，切勿提交）
+hooks/feishu_config.json
+
+# 运行日志
+*.log
+
+# Python
+__pycache__/
+*.pyc
