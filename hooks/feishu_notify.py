@@ -4,14 +4,8 @@
 Claude Code -> 飞书应用私聊通知（wb-toolkit 插件）
 只用 Python 标准库，无需 pip 安装任何依赖。
 
-工作方式：
-  1. Claude Code 触发 hook 时，把事件 JSON 通过 stdin 传进来。
-  2. 本脚本读取事件，映射成一条飞书消息（卡片）。
-  3. 用飞书自建应用的 app_id/app_secret 换 tenant_access_token，
-     再把消息私发给指定的 receive_id。
-
-配置来源（优先级：环境变量 > 同目录 feishu_config.json）：
-  FEISHU_APP_ID / FEISHU_APP_SECRET / FEISHU_RECEIVE_ID / FEISHU_RECEIVE_ID_TYPE
+飞书 API 面（鉴权、发卡片、错误封装）已收口进独立深模块
+`feishu_client.FeishuClient`，本文件只负责：读事件、建卡片、编排发送。
 
 设计原则：无论如何都不阻断 Claude —— 任何异常都吞掉并以退出码 0 结束，
 错误写到同目录 feishu_notify.log 方便排查。
@@ -21,14 +15,12 @@ import sys
 import os
 import json
 import time
-import urllib.request
-import urllib.error
+
+from feishu_client import FeishuClient, FeishuError
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "feishu_config.json")
 LOG_PATH = os.path.join(HERE, "feishu_notify.log")
-
-FEISHU_BASE = "https://open.feishu.cn/open-apis"
 
 
 def log(msg):
@@ -65,22 +57,6 @@ def load_config():
         if v:
             cfg[k] = v
     return cfg
-
-
-def http_post(url, headers, body):
-    data = json.dumps(body).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-    with urllib.request.urlopen(req, timeout=8) as resp:
-        return json.loads(resp.read().decode("utf-8"))
-
-
-def get_token(app_id, app_secret):
-    url = FEISHU_BASE + "/auth/v3/tenant_access_token/internal"
-    r = http_post(url, {"Content-Type": "application/json"},
-                  {"app_id": app_id, "app_secret": app_secret})
-    if r.get("code") != 0:
-        raise RuntimeError("获取 token 失败: %s" % r)
-    return r["tenant_access_token"]
 
 
 # ---- 事件 -> 卡片样式 映射（精简版） ----
@@ -134,24 +110,6 @@ def build_card(event, payload, cfg):
     return card
 
 
-def send_message(cfg, card):
-    token = get_token(cfg["app_id"], cfg["app_secret"])
-    url = "%s/im/v1/messages?receive_id_type=%s" % (FEISHU_BASE, cfg["receive_id_type"])
-    headers = {
-        "Authorization": "Bearer %s" % token,
-        "Content-Type": "application/json; charset=utf-8",
-    }
-    body = {
-        "receive_id": cfg["receive_id"],
-        "msg_type": "interactive",
-        "content": json.dumps(card, ensure_ascii=False),
-    }
-    r = http_post(url, headers, body)
-    if r.get("code") != 0:
-        raise RuntimeError("发送消息失败: %s" % r)
-    return r
-
-
 def main():
     try:
         raw = sys.stdin.read()
@@ -172,17 +130,14 @@ def main():
 
     try:
         card = build_card(event, payload, cfg)
-        send_message(cfg, card)
+        client = FeishuClient(
+            cfg["app_id"], cfg["app_secret"],
+            cfg["receive_id"], cfg["receive_id_type"],
+        )
+        client.send_card(card)
         log("已发送通知: %s" % event)
-    except urllib.error.HTTPError as e:
-        body = ""
-        try:
-            body = e.read().decode("utf-8", "replace")
-        except Exception:
-            pass
-        log("HTTP %s: %s" % (e.code, body))
-    except urllib.error.URLError as e:
-        log("网络错误: %r" % e)
+    except FeishuError as e:
+        log("通知失败: %s" % e)
     except Exception as e:
         log("发送失败: %r" % e)
 

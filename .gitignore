@@ -7,3 +7,6 @@ hooks/feishu_config.json
 # Python
 __pycache__/
 *.pyc
+
+# 项目本地记忆 / 工作数据（不进版本库）
+.workbuddy/
