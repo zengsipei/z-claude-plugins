@@ -27,6 +27,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "feishu_config.json")
 LOG_PATH = os.path.join(HERE, "feishu_notify.log")
 
+# 默认启用事件（候选3，issue #8）：原 3 + 新 SessionStart/SessionEnd 默认开；
+# UserPromptSubmit / PreToolUse / PostToolUse 默认关（避免刷屏），需要时自行加入。
+DEFAULT_ENABLED_EVENTS = [
+    "Notification", "Stop", "SubagentStop", "SessionStart", "SessionEnd",
+]
+
 
 def _log(msg):
     try:
@@ -47,7 +53,7 @@ def load_config():
         "receive_id": "",
         "receive_id_type": "open_id",  # open_id / user_id / union_id / email / chat_id
         # 想临时关掉某些事件的通知，把它从下面列表删掉即可
-        "enabled_events": ["Notification", "Stop", "SubagentStop"],
+        "enabled_events": list(DEFAULT_ENABLED_EVENTS),
     }
     if os.path.exists(CONFIG_PATH):
         try:

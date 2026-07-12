@@ -3,5 +3,22 @@
   "app_secret": "你的AppSecret",
   "receive_id": "你的union_id或user_id或open_id",
   "receive_id_type": "union_id",
-  "enabled_events": ["Notification", "Stop", "SubagentStop"]
+  "enabled_events": ["Notification", "Stop", "SubagentStop", "SessionStart", "SessionEnd"],
+  "notifiers": [
+    {
+      "type": "webhook",
+      "enabled": false,
+      "url": "https://your-webhook.example.com/hook",
+      "timeout": 8
+    }
+  ],
+  "throttle": {
+    "window": 30,
+    "events": ["Stop", "SubagentStop"]
+  },
+  "delivery_rules": {
+    "blocked_projects": [],
+    "quiet_hours": {"start": 22, "end": 8},
+    "bypass_events": ["Notification"]
+  }
 }

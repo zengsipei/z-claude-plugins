@@ -12,7 +12,9 @@ import unittest
 from unittest import mock
 
 from feishu_client import FeishuClient, FeishuError
+import feishu_client
 import feishu_notify
+import notifiers
 
 
 AUTH_URL = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal"
@@ -85,6 +87,18 @@ class TestFeishuClient(unittest.TestCase):
             c.send_card({"a": 1})
 
 
+class FakeNotifier(notifiers.Notifier):
+    def __init__(self):
+        self.calls = []
+    def notify(self, event, payload):
+        self.calls.append((event, payload))
+
+
+class FailingNotifier(notifiers.Notifier):
+    def notify(self, event, payload):
+        raise RuntimeError("boom")
+
+
 class TestNotifyOrchestration(unittest.TestCase):
     FULL_CFG = {
         "app_id": "app", "app_secret": "secret",
@@ -92,56 +106,80 @@ class TestNotifyOrchestration(unittest.TestCase):
         "enabled_events": ["Notification", "Stop", "SubagentStop"],
     }
 
-    def _run_main(self, stdin_json, cfg=None, client_cls=None):
+    def _run_main(self, stdin_json, cfg=None, notifier_list=None,
+                  throttle_result=False, deliver_result=True):
+        """隔离测试编排管道：注入 notifiers，并把 throttle/delivery/mark_sent 做成可控。
+
+        返回 (rc, mark_sent_mock)。
+        """
         cfg = cfg if cfg is not None else self.FULL_CFG
-        with mock.patch.object(feishu_notify, "load_config", return_value=cfg):
-            patcher = None
-            if client_cls is not None:
-                patcher = mock.patch.object(feishu_notify, "FeishuClient", client_cls)
-                patcher.start()
+        with mock.patch.object(feishu_notify, "load_config", return_value=cfg), \
+             mock.patch.object(feishu_notify.delivery_rules, "should_deliver",
+                               return_value=deliver_result) as sd, \
+             mock.patch.object(feishu_notify, "is_throttled",
+                               return_value=throttle_result) as it, \
+             mock.patch.object(feishu_notify, "mark_sent", return_value=None) as mk:
             old = sys.stdin
             sys.stdin = io.StringIO(stdin_json)
             try:
-                return feishu_notify.main()
+                rc = feishu_notify.main(notifiers=notifier_list)
             finally:
                 sys.stdin = old
-                if patcher is not None:
-                    patcher.stop()
+        return rc, mk
 
     def test_disabled_event_returns_zero_no_send(self):
-        sent = []
-        class FakeClient:
-            def __init__(self, *a, **k):
-                pass
-            def send_card(self, card):
-                sent.append(card)
-        rc = self._run_main('{"hook_event_name":"BogusEvent"}',
-                             cfg={**self.FULL_CFG, "enabled_events": []},
-                             client_cls=FakeClient)
+        fn = FakeNotifier()
+        rc, mk = self._run_main('{"hook_event_name":"BogusEvent"}',
+                                cfg={**self.FULL_CFG, "enabled_events": []},
+                                notifier_list=[fn])
         self.assertEqual(rc, 0)
-        self.assertEqual(sent, [])
+        self.assertEqual(fn.calls, [])
+        mk.assert_not_called()
 
-    def test_enabled_event_sends_card(self):
-        captured = {}
-        class FakeClient:
-            def __init__(self, *a, **k):
-                captured["args"] = (a, k)
-            def send_card(self, card):
-                captured["card"] = card
-        rc = self._run_main('{"hook_event_name":"Stop","session_id":"abc123"}',
-                             client_cls=FakeClient)
+    def test_enabled_event_delivers_and_marks(self):
+        fn = FakeNotifier()
+        rc, mk = self._run_main('{"hook_event_name":"Stop","session_id":"abc123"}',
+                                 notifier_list=[fn])
         self.assertEqual(rc, 0)
-        self.assertIn("card", captured)
-        self.assertEqual(captured["args"][0][0], "app")
+        self.assertEqual(fn.calls, [("Stop", {"hook_event_name": "Stop", "session_id": "abc123"})])
+        mk.assert_called_once_with("Stop")
 
-    def test_feishu_error_does_not_propagate(self):
-        class FailClient:
-            def __init__(self, *a, **k):
-                pass
-            def send_card(self, card):
-                raise FeishuError("boom")
-        rc = self._run_main('{"hook_event_name":"Stop"}', client_cls=FailClient)
+    def test_delivery_rule_rejection_skips(self):
+        fn = FakeNotifier()
+        rc, mk = self._run_main('{"hook_event_name":"Stop"}',
+                                notifier_list=[fn], deliver_result=False)
+        self.assertEqual(rc, 0)
+        self.assertEqual(fn.calls, [])
+        mk.assert_not_called()
+
+    def test_throttle_skip_skips(self):
+        fn = FakeNotifier()
+        rc, mk = self._run_main('{"hook_event_name":"Stop"}',
+                                notifier_list=[fn], throttle_result=True)
+        self.assertEqual(rc, 0)
+        self.assertEqual(fn.calls, [])
+        mk.assert_not_called()
+
+    def test_notifier_failure_does_not_propagate(self):
+        rc, mk = self._run_main('{"hook_event_name":"Stop"}',
+                                notifier_list=[FailingNotifier()])
         self.assertEqual(rc, 0)  # 永不阻断
+        mk.assert_not_called()    # 没成功发送就不 mark_sent
+
+    def test_enabled_event_builds_feishu_notifier_e2e(self):
+        created = []
+        class FakeClient:
+            def __init__(self, *a, **k):
+                created.append(self)
+                self.sent = []
+            def send_card(self, card):
+                self.sent.append(card)
+        with mock.patch.object(feishu_client, "FeishuClient", FakeClient):
+            rc, mk = self._run_main('{"hook_event_name":"Stop"}')
+        self.assertEqual(rc, 0)
+        # 凭据齐全 → make_notifiers 构建了 FeishuNotifier → 真实走 FeishuClient
+        self.assertEqual(len(created), 1)
+        self.assertEqual(len(created[0].sent), 1)
 
 
 if __name__ == "__main__":
