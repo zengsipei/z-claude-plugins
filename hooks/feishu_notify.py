@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Claude Code -> 飞书应用私聊通知（wb-toolkit 插件）
+Claude Code -> 飞书应用私聊通知（z-cc-plugin 插件）
 只用 Python 标准库，无需 pip 安装任何依赖。
 
 飞书 API 面（鉴权、发卡片、错误封装）已收口进独立深模块

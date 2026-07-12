@@ -1,4 +1,6 @@
-# wb-toolkit
+# z-cc-plugin
+
+> 仓库地址：https://github.com/zengsipei/z-cc-plugin（Public）
 
 个人 Claude Code 插件工具箱。当前包含的第一个功能点：**飞书通知**——
 Claude 触发特定 hook 时，自动通过飞书自建应用给你发私聊卡片，
@@ -11,16 +13,22 @@ Claude 触发特定 hook 时，自动通过飞书自建应用给你发私聊卡�
 ## 目录结构
 
 ```
-wb-toolkit/
+z-cc-plugin/
 ├── .claude-plugin/
 │   └── plugin.json          # 插件清单（name / description / version / author）
 ├── hooks/
 │   ├── hooks.json           # 注册的 hook 事件（Notification / Stop / SubagentStop）
-│   ├── feishu_notify.py     # 通知脚本（纯标准库，无需 pip）
+│   ├── feishu_notify.py     # 通知脚本（编排 + 建卡，纯标准库，无需 pip）
+│   ├── feishu_client.py     # FeishuClient 深模块（鉴权 + 传输，纯标准库）
+│   ├── test_feishu_client.py# FeishuClient 零网络单测（unittest）
 │   ├── feishu_config.json   # 真实配置（含密钥，已 gitignore）
 │   └── feishu_config.example.json  # 配置模板（可提交）
+├── docs/
+│   ├── agents/              # Matt 工程 skill 仓库级配置（issue-tracker / triage-labels / domain）
+│   └── adr/                 # 架构决策记录（ADR，如 0001 纯 stdlib 决策）
 ├── skills/                  # 未来放 skills（每个 <name>/SKILL.md）
 ├── commands/                # 未来放 commands（平面 markdown）
+├── CLAUDE.md                # 工程 skill 配置入口 + 通用编码准则
 ├── .gitignore
 └── README.md
 ```
@@ -52,17 +60,17 @@ echo '{"hook_event_name":"Notification","message":"测试","cwd":".","session_id
 
 ### 方式 A：本地临时加载（先验证）
 ```bash
-claude --plugin-dir F:/zsp/Learn/wb-toolkit
+claude --plugin-dir <插件仓库根目录绝对路径>
 ```
 仅当前会话生效，方便调试。
 
 ### 方式 B：作为常驻插件（推荐）
-把本仓库推到私有 git 仓库（如 GitHub/GitLab），然后在 Claude Code 里：
+在 Claude Code 里：
 ```
-/plugin marketplace add <你的仓库URL>
-/plugin install wb-toolkit@<marketplace名>
+/plugin marketplace add https://github.com/zengsipei/z-cc-plugin
+/plugin install z-cc-plugin
 ```
-或把它放进 `~/.claude/plugins/wb-toolkit` 并启用。具体以 `/plugin` 命令提示为准。
+或把它放进 `~/.claude/plugins/z-cc-plugin` 并启用。具体以 `/plugin` 命令提示为准。
 
 ## 重要：避免重复通知
 
@@ -70,8 +78,8 @@ claude --plugin-dir F:/zsp/Learn/wb-toolkit
 + `.claude/hooks/`），启用本插件后该事件会**触发两次**（项目 + 插件各一次）。
 确认插件通知正常后，删除项目里的那份即可：
 ```bash
-rm -f F:/zsp/Learn/ZAgent/.claude/settings.json
-rm -rf F:/zsp/Learn/ZAgent/.claude/hooks
+rm -f <旧项目>/.claude/settings.json
+rm -rf <旧项目>/.claude/hooks
 ```
 
 ## 如何扩展新功能点

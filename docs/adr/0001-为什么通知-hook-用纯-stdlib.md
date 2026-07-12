@@ -7,7 +7,7 @@ deciders: z
 
 ## 背景（Context）
 
-wb-toolkit 的飞书通知 hook 在每个 Claude hook 事件（Notification / Stop /
+z-cc-plugin 的飞书通知 hook 在每个 Claude hook 事件（Notification / Stop /
 SubagentStop）上以**独立子进程**运行，核心约束（写进 README）是：① 纯 Python
 标准库、无需 pip；② 永不阻断 Claude（异常全吞、退出码 0）。
 
