@@ -1,12 +1,12 @@
 # 飞书通知密钥（含真实凭据，切勿提交）
-hooks/feishu_config.json
+**/hooks/feishu_config.json
 
 # 运行日志
 *.log
 
 # 节流状态（跨进程冷却时间戳，运行时生成）
-hooks/.throttle_state.json
-hooks/.throttle_state.json.tmp
+**/hooks/.throttle_state.json
+**/hooks/.throttle_state.json.tmp
 
 # Python
 __pycache__/
@@ -14,3 +14,6 @@ __pycache__/
 
 # 项目本地记忆 / 工作数据（不进版本库）
 .workbuddy/
+
+# Orca 本地状态
+.orca/

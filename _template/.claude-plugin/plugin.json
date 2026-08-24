@@ -1,0 +1,16 @@
+{
+  "name": "my-plugin",
+  "version": "0.1.0",
+  "description": "一句话描述这个插件做什么。",
+  "author": {
+    "name": "zsp",
+    "url": "https://github.com/zengsipei"
+  },
+  "homepage": "https://github.com/zengsipei/z-cc-plugin/tree/main/my-plugin",
+  "repository": "https://github.com/zengsipei/z-cc-plugin",
+  "license": "MIT",
+  "keywords": [
+    "keyword1",
+    "keyword2"
+  ]
+}

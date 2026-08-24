@@ -1,6 +1,0 @@
-{
-  "name": "z-cc-plugin",
-  "description": "个人 Claude Code 工具箱：飞书通知等实用功能（hooks / skills 集合）",
-  "version": "0.1.0",
-  "author": { "name": "z" }
-}

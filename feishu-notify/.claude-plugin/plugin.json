@@ -1,0 +1,20 @@
+{
+  "name": "feishu-notify",
+  "version": "0.1.0",
+  "description": "Claude Code / Cowork 触发 hook 时，通过飞书自建应用推送私聊卡片通知（纯标准库，无第三方依赖）。让你不在电脑前也能知道「待处理 / 已完成 / 子任务完成」。",
+  "author": {
+    "name": "zsp",
+    "url": "https://github.com/zengsipei"
+  },
+  "homepage": "https://github.com/zengsipei/z-cc-plugin/tree/main/feishu-notify",
+  "repository": "https://github.com/zengsipei/z-cc-plugin",
+  "license": "MIT",
+  "keywords": [
+    "feishu",
+    "lark",
+    "notify",
+    "notification",
+    "hooks",
+    "productivity"
+  ]
+}
