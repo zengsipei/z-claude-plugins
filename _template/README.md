@@ -17,6 +17,6 @@ TODO：描述这个插件提供什么能力。
 ## 安装
 
 ```
-/plugin marketplace add https://github.com/zengsipei/z-cc-plugin
+/plugin marketplace add https://github.com/zengsipei/z-claude-plugins
 /plugin install my-plugin@z-claude-plugins
 ```

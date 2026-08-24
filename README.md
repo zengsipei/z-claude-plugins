@@ -19,7 +19,7 @@
 在 Claude Code / Cowork 中：
 
 ```
-/plugin marketplace add https://github.com/zengsipei/z-cc-plugin
+/plugin marketplace add https://github.com/zengsipei/z-claude-plugins
 ```
 
 市场名取自 `marketplace.json` 的 `name` 字段：`z-claude-plugins`。
@@ -85,8 +85,6 @@ z-claude-plugins/
 
 ## 说明
 
-- 本仓库由原本的单插件 `z-cc-plugin` 重构为市场结构；旧的安装方式
-  （`/plugin install z-cc-plugin`）已失效，请改用上面的 `@z-claude-plugins` 市场安装。
-- 远程仓库名仍为 `z-cc-plugin`（GitHub 侧可选择性改名为 `z-claude-plugins` 以对齐），
-  不影响安装——安装URL用的是仓库地址，市场后缀来自 `marketplace.json` 的 `name`。
+- 本仓库由原本的单插件仓库重构为市场结构（monorepo），安装方式见上方「安装使用」。
+- 远程仓库名与本地目录一致，均为 `z-claude-plugins`；安装 URL 用仓库地址，市场后缀来自 `marketplace.json` 的 `name`。
 - 含密钥文件（如 `feishu-notify/hooks/feishu_config.json`）已 gitignore，切勿提交。

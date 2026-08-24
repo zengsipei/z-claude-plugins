@@ -1,6 +1,6 @@
 # 调研：飞书双向互动卡片可行性（候选6）
 
-> Wayfinder 地图 [#5](https://github.com/zengsipei/z-cc-plugin/issues/5) · research ticket [#11](https://github.com/zengsipei/z-cc-plugin/issues/11)
+> Wayfinder 地图 [#5](https://github.com/zengsipei/z-claude-plugins/issues/5) · research ticket [#11](https://github.com/zengsipei/z-claude-plugins/issues/11)
 > 类型：research（AFK 读文档）· 强度：Speculative · 日期：2026-07-12
 > 目的：为 fog「候选6 升级判定」提供事实依据——**是否升级为设计 ticket / 是否需重开 [ADR-0001](../adr/0001-为什么通知-hook-用纯-stdlib.md)**。
 

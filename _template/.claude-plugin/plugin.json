@@ -6,8 +6,8 @@
     "name": "zsp",
     "url": "https://github.com/zengsipei"
   },
-  "homepage": "https://github.com/zengsipei/z-cc-plugin/tree/main/my-plugin",
-  "repository": "https://github.com/zengsipei/z-cc-plugin",
+  "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/my-plugin",
+  "repository": "https://github.com/zengsipei/z-claude-plugins",
   "license": "MIT",
   "keywords": [
     "keyword1",

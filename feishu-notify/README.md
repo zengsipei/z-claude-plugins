@@ -2,7 +2,7 @@
 
 > 个人 Claude 插件：Claude 触发特定 hook 时，自动通过飞书自建应用给你发私聊卡片，
 > 让你不在电脑前也能知道「待处理 / 已完成 / 子任务完成」。
-> 本插件属于市场 [`z-claude-plugins`](https://github.com/zengsipei/z-cc-plugin) 的一部分。
+> 本插件属于市场 [`z-claude-plugins`](https://github.com/zengsipei/z-claude-plugins) 的一部分。
 
 插件机制下，hooks 通过 `hooks/hooks.json` 注册，脚本用
 `${CLAUDE_PLUGIN_ROOT}` 引用，启用后**对所有项目全局生效**，
@@ -62,7 +62,7 @@ echo '{"hook_event_name":"Notification","message":"测试","cwd":".","session_id
 
 ## 启用插件
 
-本插件通过市场 [`z-claude-plugins`](https://github.com/zengsipei/z-cc-plugin) 安装：
+本插件通过市场 [`z-claude-plugins`](https://github.com/zengsipei/z-claude-plugins) 安装：
 
 ### 方式 A：本地临时加载（先验证）
 ```bash
@@ -73,7 +73,7 @@ claude --plugin-dir <本仓库根目录>/feishu-notify
 ### 方式 B：作为常驻插件（推荐）
 在 Claude Code / Cowork 中：
 ```
-/plugin marketplace add https://github.com/zengsipei/z-cc-plugin
+/plugin marketplace add https://github.com/zengsipei/z-claude-plugins
 /plugin install feishu-notify@z-claude-plugins
 ```
 

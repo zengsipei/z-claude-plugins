@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Claude Code -> 通知（z-cc-plugin 插件，多通道）。
+Claude Code -> 通知（z-claude-plugins 插件，多通道）。
 
 只用 Python 标准库，无需 pip。职责拆分（见 issue #1 深化 + #5 架构地图）：
 - feishu_client.FeishuClient：飞书 API 面（鉴权 + 发卡片），深模块（候选 A）。

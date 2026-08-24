@@ -8,7 +8,7 @@
       "name": "feishu-notify",
       "source": "./feishu-notify",
       "description": "Claude Code / Cowork 触发 hook 时通过飞书自建应用推送私聊卡片通知（纯标准库，无依赖）。",
-      "homepage": "https://github.com/zengsipei/z-cc-plugin/tree/main/feishu-notify",
+      "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/feishu-notify",
       "category": "productivity"
     }
   ]
