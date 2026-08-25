@@ -23,7 +23,10 @@
 
 ## 闸门状态
 
-评审/预推闸门（`hooks/dsh-spec-gate.py`）为 no-op 占位，行为由 D3 (#18) 决定；当前不阻断任何流程。
+分层双闸（D3 #18）已落地：
+- **权威闸口** —— `/dsh-spec-review --gate strict`（默认）：合并前由人触发，委派 `code-review` 做标准评审 + 逐改动 note/ADR 审计，缺 note 即阻断。
+- **提醒闸口** —— `hooks/dsh-spec-gate.py`（Stop 钩子）：会话级 warn-only 提醒，工作树有改动却未建 `.agents/notes/`/`docs/adr/` 时 stderr 提示、**零退出、不阻断**。
+- 测试不变量轴（复用 `tdd`）不在 v1：v1 闸门只覆盖评审 + note 审计，tdd 留 v2。
 
 ## 设计来源
 

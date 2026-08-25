@@ -16,7 +16,8 @@ description: 合并前闸门——跑 code-review skill，再审计自 --since �
 
 1. 解析 `--since`（默认上次 merge base）与 `--gate`（默认 strict）。
    - 完成判定：两者已确定。
-2. 把评审委派给本仓库已有的 `code-review` skill，范围相同（自 `--since` 起的改动）。
+2. 把标准评审委派给本仓库已有的 `code-review` skill：以 `--since` 解析出的固定点（commit/branch/tag/merge-base，默认上次 merge-base）作为 code-review 的「固定点」传入，范围同为自该点起到 HEAD 的三点 diff。code-review 会并行跑 Standards / Spec 两轴，本 skill 不重造其逻辑，只消费结论。
+   - 接口方式：通过 `Skill` 工具按名调用 `code-review`（命令 `/dsh-spec-review` 的 `allowed-tools` 已含 `Skill`）；将上一步确定的固定点作为 code-review 的固定点原样传入，不另起一套评审实现。
    - 完成判定：`code-review` 已产出结论。
 3. 枚举 `--since` 起的每个非平凡改动（比对 `git log --since`），逐个确认 `.agents/notes/` 或 `docs/adr/` 中存在对应记录（按改动主题/文件匹配 note slug 或 ADR）。
    - 完成判定：每个改动已匹配到 note/ADR，或列入缺口清单。
@@ -29,4 +30,12 @@ description: 合并前闸门——跑 code-review skill，再审计自 --since �
 
 ## 范围
 
-只审计与闸门。闸门触发位置（D3 #18）由 hook 决定；评审逻辑本身不在此实现，复用 `code-review`。
+只审计与闸门。触发位置分两层（D3 #18）：
+- **权威闸口** = 本命令 `/dsh-spec-review --gate strict`（默认）：由人触发，合并前跑。
+- **提醒闸口** = `Stop` hook（`hooks/dsh-spec-gate.py`）：会话级 warn-only 提醒，工作树有改动却未建 note/ADR 时 stderr 提示、零退出、不阻断。
+
+评审逻辑本身不在此实现，复用 `code-review`。精确逐 commit↔note 匹配归本命令的 step 3。
+
+### v1 不接入 `tdd`（测试不变量轴留 v2）
+
+测试不变量是六大支柱之一、明确列为 v2 范围（地图 Notes / Out of scope）。v1 的评审/预推闸门**只覆盖两件事**：`code-review` 标准评审 + 逐改动 note/ADR 审计。本命令与 `Stop` hook 均**不调用 `tdd`**；未来若加「测试不变量」轴，可新增 `--axis test` 复用 `tdd`，不在本次落地。
