@@ -10,6 +10,13 @@
       "description": "Claude Code / Cowork 触发 hook 时通过飞书自建应用推送私聊卡片通知（纯标准库，无依赖）。",
       "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/feishu-notify",
       "category": "productivity"
+    },
+    {
+      "name": "dsh-spec",
+      "source": "./dsh-spec",
+      "description": "把 deepseek-harness 的活文档与变更台账纪律移植为 Claude Code 插件：活文档 + 变更台账 + 评审/预推闸门，防止大量 commit 后代码腐化。",
+      "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/dsh-spec",
+      "category": "engineering"
     }
   ]
 }
