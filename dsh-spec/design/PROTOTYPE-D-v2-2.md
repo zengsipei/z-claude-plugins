@@ -8,7 +8,8 @@
 - R-v2-1 (#24)：dsh 真实纪律 = 每文件 100% 覆盖率 + 无密钥快照回放 + 运行时不变量；但属 CI 硬门禁，对文档/技能密集仓过重。
 - R-v2-2 (#25)：`/dsh-spec-review --axis test` 复用 `tdd` 可行；`tdd` 是「开发期 red-green 指南」，**不生审计报告、不接受 diff 参数**，故应作「判定标准库」而非执行器。
 - R-v2-3 (#26)：强类型门禁归 D-v2-4；本票不涉及。
-- D-v2-1 (#27)：v2 收口 = 三大支柱设计 + 分工澄清；支柱1 测试不变量 = **必做 review 轴 `--axis test` 复用 tdd（人触发、可 strict）**；rot `tests` 升级 Out of scope。
+- D-v2-1 (#27)：v2 收口 = 三大支柱设计 + 分工澄清；支柱1 测试不变量 = **必做 review 轴 `--axis test`（人触发、可 strict）**；rot `tests` 升级 Out of scope。
+- #28 重开（v2 自包含铁律 #31 / #33）：原 Q2「经 Skill 调 `tdd`」改为**内化 `tdd` 定义**进本 rulebook；pillar 设计（Q1/Q3/Q4/Q5/Q6）不变。详见 §2。
 
 ## 决策摘要（设计建议，待 reaction）
 
@@ -29,15 +30,15 @@ v1 的 `/dsh-spec-review` 隐式跑 `code`（委派 code-review）+ `notes`（no
 
 > 不在 code-review 内部注入第三轴；test 是 dsh-spec-review 自身兄弟闸门步骤，仅共享固定点。
 
-## 2. tdd 复用边界：判定标准库，非执行器（Q2）
+## 2. tdd 复用边界：判定标准库（化用），非执行器、非运行时依赖（Q2）
 
 `--axis test` 的步骤：
-1. 通过 `Skill` 工具按名调用 `tdd`，取其「好测试」定义作判定标准：
+1. **内化** `tdd` 的「好测试」定义（seam 概念 + 三类反模式，见 §4）进 `dsh-spec-review` 自身 rulebook，作为判定标准；**不**经 `Skill` 工具运行时调 `tdd`。理由：v2 自包含铁律（#31 / #33）要求插件运行时零外部技能依赖，复用 = 化用（吸收进自身规则书，而非运行时引用外部技能）。
    - 测试应经**公开接口**验证行为，而非实现细节（重构成败不应让测试红）。
    - 三类反模式（见 §4）：实现耦合 / 同义反复 / 水平切片。
-2. 审计逻辑由 `dsh-spec-review` **自实现**（类比 step3 note 审计），`tdd` 不产出审计报告、不接受 diff 参数。
+2. 审计逻辑由 `dsh-spec-review` **自实现**（类比 step3 note 审计）。
 
-`allowed-tools` 已含 `Skill`，无需改命令声明。
+> 与原初版差异（#28 重开）：v1 预留「`--axis test` 复用 `tdd`」改为**内化** tdd 定义；`allowed-tools` 中 `Skill` 仅为 code 轴委派 `code-review` 保留，test 轴不再运行时调 `tdd`。（后经 #33，code 轴亦内化、不再委派，`Skill` 仅存「外部技能在场可选增强」用途。）
 
 ## 3. 审计逻辑（自实现，Q3 + Q4）
 
@@ -91,12 +92,12 @@ v1 的 `/dsh-spec-review` 隐式跑 `code`（委派 code-review）+ `notes`（no
 ## 已锁定取舍（D-v2-2 设计结论 — Q1–Q6，用户授权自主推进）
 
 - **Q1**：新增 `--axis <all|code|spec|notes|test>`，默认 `all`（含 test）；v1 行为=`code,notes`，未就绪用 `--axis code,notes` 退出。
-- **Q2**：tdd 作判定标准库；`--axis test` 经 Skill 调 tdd 取「好测试」定义，审计自实现（类比 step3）。
+- **Q2**：tdd 作判定标准库（**内化**其「好测试」定义进本 rulebook，运行时零外部 `tdd` 技能依赖；复用=化用，自包含铁律）；审计自实现（类比 step3）。
 - **Q3**：审计对象 = `git diff <since>...HEAD` 非测试源码改动，排除 .md/skill 文本/spec/docs。
 - **Q4**：判定清单 = ①seam 有对应测试（新代码须带测试）②不命中三类反模式；不采纳覆盖率/快照。
 - **Q5**：review 轴、人触发、合并前；`--gate strict` 缺口即非零退出（不 PreToolUse）；`--gate warn` 仅报告。
 - **Q6**：rot `tests` 保持 v1 warn-only 不升级；code-review 两轴不变；test 轴是兄弟闸门步骤。
 
 ## 状态
-- D-v2-2 (#28) 原型已起；结论按 Q1–Q6 推荐锁定，由 #28 resolution 记录并关闭。
-- 真实落地归 #32（命令/技能面与命名）派生 build 票；本文件保留为设计史。
+- D-v2-2 (#28) 原型已起；结论按 Q1–Q6 锁定，其中 Q2 经 #28 重开改为**内化 tdd 定义**（自包含铁律），已由 #28 resolution 记录并关闭。
+- 真实落地归 #32（命令/技能面与命名）派生 build 票；本文件保留为设计史；与 #33 内化 code-review 同文件同次 build 落地 `dsh-spec-review` SKILL.md（真实 `--axis test` 参数解析 / seam 默认约定 / 输出格式）。

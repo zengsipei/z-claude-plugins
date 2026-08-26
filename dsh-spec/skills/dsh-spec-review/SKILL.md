@@ -1,41 +1,123 @@
 ---
 name: dsh-spec-review
-description: 合并前闸门——跑 code-review skill，再审计自 --since 起的每个非平凡改动是否都有对应 note/ADR。当用户说「评审」「合并前检查」「跑闸门」，或准备合并时调用。
+description: 合并前闸门——多轴评审：code（Standards/Spec 标准评审，准则内化）、notes（note/ADR 台账审计）、test（seam 测试审计）、types（类型退化审计），由 --axis 选择、--gate 处置缺口。当用户说「评审」「合并前检查」「跑闸门」，或准备合并时调用。
 ---
 
 # dsh-spec-review
 
-合并闸门：标准评审 + dsh-spec「无 note 不合并」审计。复用现有 `code-review` skill，不重造评审逻辑。
+合并闸门：四轴评审 + 缺口统一处置。全部评审准则**内化于本规则书**——运行时零外部技能依赖（自包含铁律）；外部 `code-review`/`tdd` 技能在场仅可选增强，缺席绝不导致失败。
 
 ## 参数
 
-- `--since <ref>`：审计起点，默认上次 merge base（如 `$(git merge-base HEAD origin/main)` 或最近一次 merge commit）。
-- `--gate <strict|warn>`：默认 `strict`。`strict` 缺 note 即报错阻断；`warn` 仅提醒、零退出。
+- `--since <ref>`：审计起点，默认上次 merge base（如 `$(git merge-base HEAD origin/main)` 或最近一次 merge commit）。**code/notes/test/types 四轴共用同一固定审计窗口**。
+- `--gate <strict|warn>`：默认 `strict`。**对所有选中轴统一生效**：strict 下任意轴有缺口即报错、非零退出、阻断合并决定（人仍拍板）；warn 仅列缺口提醒、零退出。
+- `--axis <all|code|notes|test|types>`：评审轴选择，默认 `all` = `code,notes,test,types`。支持逗号组合（如 `--axis code,notes` = 精确复现 v1 行为，未就绪团队以此退出新轴）。枚举之外任何值（含组合中的非法元素）→ 报错退出，不静默降级、不猜测意图。
 
 ## 步骤
 
-1. 解析 `--since`（默认上次 merge base）与 `--gate`（默认 strict）。
-   - 完成判定：两者已确定。
-2. 把标准评审委派给本仓库已有的 `code-review` skill：以 `--since` 解析出的固定点（commit/branch/tag/merge-base，默认上次 merge-base）作为 code-review 的「固定点」传入，范围同为自该点起到 HEAD 的三点 diff。code-review 会并行跑 Standards / Spec 两轴，本 skill 不重造其逻辑，只消费结论。
-   - 接口方式：通过 `Skill` 工具按名调用 `code-review`（命令 `/dsh-spec-review` 的 `allowed-tools` 已含 `Skill`）；将上一步确定的固定点作为 code-review 的固定点原样传入，不另起一套评审实现。
-   - 完成判定：`code-review` 已产出结论。
-3. 枚举 `--since` 起的每个非平凡改动（比对 `git log --since`），逐个确认 `.agents/notes/` 或 `docs/adr/` 中存在对应记录（按改动主题/文件匹配 note slug 或 ADR）。
-   - 完成判定：每个改动已匹配到 note/ADR，或列入缺口清单。
-4. 按 `--gate` 处置缺口：
-   - `strict`：报告缺口并以非零退出，阻断合并。
-   - `warn`：仅列缺口提醒，零退出。
-   - 完成判定：闸门结论已给出；strict 下遇缺口即停。
-5. 汇总：code-review 结论 + note 审计结果，给出单一结论（通过 / 阻断）。
+1. 解析参数：`--since`（默认上次 merge base）、`--gate`（默认 strict）、`--axis`（默认 all，逗号拆分后逐项校验枚举 {code, notes, test, types}）。
+   - 完成判定：三个参数已确定且合法；非法 `--axis` 已报错退出。
+2. 解析固定审计窗口：确认 `--since` 可解析（`git rev-parse`）、`git diff <since>...HEAD` 非空。坏 ref 或空 diff 在此失败，不进入各轴。
+   - 完成判定：diff 命令与 commit 清单（`git log <since>..HEAD --oneline`）已取得。
+3. 按 `code → notes → test → types` 顺序执行选中轴（每轴独立产出「缺口清单 / 跳过标注」，互不污染；跳过的轴零缺口）：
+   - 完成判定：每个选中轴已产出结论（通过 / 缺口清单 / 跳过标注）。
+4. 按 `--gate` 统一处置：strict 下任意轴缺口非零退出；warn 零退出。汇总给出单一结论（通过 / 阻断）+ 各轴一行摘要。
    - 完成判定：用户拿到单一结论。
+
+## 轴·code —— 标准评审（内化 Standards/Spec 两轴准则）
+
+自实现 Standards/Spec 两轴评审。评审准则内化自 code-review 评审方法，本节即完整实现而非委派存根；外部 `code-review` 技能在场时可**可选**以其结论作交叉补充，缺席时直接按本节跑、绝不报错。
+
+两轴分别报告（`## Standards` / `## Spec`），**不合并、不跨轴重排**——一轴通过可能掩盖另一轴失败。每轴末尾一行小结（发现数 + 该轴内最重问题）。code 轴缺口 = 两轴发现之和。
+
+### Standards 轴：diff 是否符合本仓成文标准？
+
+- 标准来源：仓内任何成文规范（`CODING_STANDARDS.md`、`CONTRIBUTING.md`、`CLAUDE.md`/`AGENTS.md` 中的编码约定等）。
+- 无论仓内是否成文，恒带以下 **smell 基线**（Fowler《Refactoring》ch.3 固定子集）。两条约束：
+  - **仓内标准优先**——凡仓内成文标准明确背书的写法，抑制对应 smell 不报。
+  - **smell 一律是判断题**（「疑似 Feature Envy」），非硬性违规；工具已强制的项跳过。
+- 基线（每条按 *是什么 → 怎么修* 匹配 diff）：
+  - **Mysterious Name**：名字不能揭示函数/变量/类型做什么、装什么 → 重命名；起不出诚实名字说明设计混浊。
+  - **Duplicated Code**：同一逻辑形状出现在多个 hunk/文件 → 提取共享形状，两处调用。
+  - **Feature Envy**：方法对别的对象的数据比对自己的更感兴趣 → 把方法搬到它艳羡的数据上。
+  - **Data Clumps**：同几个字段/参数总是结伴出现（一个类型想出生）→ 捆成一个类型传递。
+  - **Primitive Obsession**：用原始类型/字符串顶替应有自己类型的领域概念 → 给概念一个小类型。
+  - **Repeated Switches**：对同一类型的相同 switch/if 级联在改动中反复出现 → 多态或共享映射表替换。
+  - **Shotgun Surgery**：一个逻辑变更迫使 diff 里散落多文件小改 → 把一起变的聚到一个模块。
+  - **Divergent Change**：一个文件/模块因多个不相关原因被改 → 拆成每个模块只因一个原因变。
+  - **Speculative Generality**：为 spec 没有的需求加的抽象/参数/钩子 → 删掉、内联回去，等真需求出现再说。
+  - **Message Chains**：调用方依赖长长的 `a.b().c().d()` 导航 → 用第一个对象上的一个方法藏起这段行走。
+  - **Middle Man**：类/函数基本只在转发 → 砍掉，直接调真实目标。
+  - **Refused Bequest**：子类/实现者忽略或覆盖了继承的大部分 → 放弃继承改组合。
+- 报告要求：按文件/hunk 列 (a) 违反成文标准处——引用标准（文件 + 条款）；(b) 命中的基线 smell——点名并引用 hunk。成文违规可为硬性，基线 smell 恒为判断题。
+
+### Spec 轴：diff 是否忠实实现来源 issue/spec？
+
+- 来源识别顺序：① commit message 里的 issue 引用（`#123`、`Closes #45` 等）→ ② 用户随命令传入的路径 → ③ `docs/`、`specs/`、`.scratch/` 下匹配分支名或特性的 spec → ④ 都没有则问用户；用户说没有 → Spec 轴跳过并标注「无 spec 可用」。
+- 检查清单：(a) spec 要求了但缺失/打折扣的；(b) diff 里没人要求的行为（scope creep）；(c) 看似实现但实现有误的。每条发现**引用 spec 原句**。
+
+## 轴·notes —— note/ADR 台账审计（v1 行为不变）
+
+枚举固定审计窗口内的每个非平凡改动（比对 `git log <since>..HEAD`），逐个确认 `.agents/notes/` 或 `docs/adr/` 中存在对应记录（按改动主题/文件匹配 note slug 或 ADR）。
+
+- 缺口 = 非平凡改动无对应 note/ADR。
+
+## 轴·test —— seam 测试审计（内化「好测试」判定标准）
+
+判定标准内化自 tdd 的「好测试」定义（复用 = 化用；运行时零外部 `tdd` 技能依赖，不经 `Skill` 工具调用）：
+
+- 好测试经**公开接口**验证行为而非实现细节——实现可整个换掉、测试不应变红。
+- 测试只落在**预约定 seam**（公开边界：导出函数/类/模块公共接口、命令行入口、API 端点、hooks 事件契约），不测内部。
+
+**审计范围**：`git diff <since>...HEAD` 中的**非测试源码改动**——脚本、hooks、`*.ts`/`*.js`/`*.py` 等可执行源码。**排除**：`*.md`、skill 文本、spec、docs、以及测试文件本身（`*.test.*`、`*.spec.*`、`tests/`、`test/`、`__tests__/`、`conftest.py` 等）。排除后审计对象为空（如文档-only 改动）→ 本轴直接通过、**不要求测试**。
+
+**判定清单**（对每个非平凡源码改动）：
+
+1. 该改动触碰的 seam（公开接口处）是否有对应测试（新增或既有测试覆盖该公开接口）——即「新代码须带测试」。
+2. 该测试是否命中三类反模式之一——有测试之名、无行为约束之实同样算缺口。
+
+**反模式判定表**：
+
+| 反模式 | 含义 | 判定信号 |
+|---|---|---|
+| 实现耦合 | mock 内部协作者 / 测私有方法 / 绕过公开接口验证 | 重构内部实现而行为未变时测试红 |
+| 同义反复 | 断言显而易见、镜像实现（assert 恒真或仅复述代码） | 测试通过但不约束任何行为 |
+| 水平切片 | 先写全部测试再写全部实现（bulk RED→bulk GREEN） | 测试基于「想象行为」而非当前实现，对真实变更不敏感 |
+
+审 diff 时的具体信号：测试 import/调用下划线私有成员或 mock 非公开协作者（实现耦合）；断言用与实现相同的方式重算期望值（如 `expect(add(a,b)).toBe(a+b)`）、断言常量等于自身、期望值取自被测代码自身输出（同义反复）；大批量测试与实现同 commit 一次性落地、断言「形状」而非用户可见行为（水平切片）。
+
+**不做**：不跑测试套件、不强制覆盖率阈值、不比快照。seam 存在性 + 反模式过滤已足以表达「改动不退化测试」，且零新增依赖、零阈值维护。
+
+缺口 = seam 无对应测试，或仅有命中反模式的测试。
+
+## 轴·types —— 类型退化审计（两层信号）
+
+仅 TS/JS 仓适用（审计窗口或仓内存在 `.ts`/`.tsx`/`.js`/`.jsx`/`.mjs`/`.cjs`）；非 TS/JS 仓标注「非 TS/JS，跳过」、本轴零缺口。
+
+**工具链探测**（探测一次；与 `dsh-spec-rot --check types` 共用同一逻辑，同一仓结论一致）：
+
+1. **首选复用消费项目既有 linter**（零新增依赖）：按序检测 `tsconfig.json`（strict）→ `biome.json` → eslint 配置（`eslint.config.*`/`.eslintrc*`）→ `package.json` 的 `lint` 脚本，命中即直接调用。
+2. TS 风味但无显式配置：回退链 `tsc --strict --noEmit` → `biome check` → `eslint`，取首个**本地已可用**者；只探测、**绝不装包**。
+3. 全无 → 标注「无类型工具链，跳过」（跳过的是工具增强层；自包含层照跑）。
+
+**自包含层**（零依赖恒可跑）：对 `git diff <since>...HEAD` 的新增行（仅 TS/JS 文件）grep 以下类型气味并计数：
+
+- 显式 `any`（含 `as any`、`as unknown as`）
+- 非空断言 `obj!.prop`、`foo!`
+- `@ts-ignore` / `@ts-expect-error`
+- `as` 类型断言（强转气味）
+
+**工具增强层**（有工具链才跑）：运行探测到的工具，取**改动文件**中的类型严格度错误，报告具体文件与错误点。
+
+气味与工具错误即 types 轴缺口（新引入的类型退化）。`--gate strict` 下缺口非零退出。
 
 ## 范围
 
-只审计与闸门。触发位置分两层（D3 #18）：
-- **权威闸口** = 本命令 `/dsh-spec-review --gate strict`（默认）：由人触发，合并前跑。
-- **提醒闸口** = `Stop` hook（`hooks/dsh-spec-gate.py`）：会话级 warn-only 提醒，工作树有改动却未建 note/ADR 时 stderr 提示、零退出、不阻断。
+只审计与闸门。触发位置两层（D3 #18，v2 不变）：
 
-评审逻辑本身不在此实现，复用 `code-review`。精确逐 commit↔note 匹配归本命令的 step 3。
+- **权威闸口** = 本命令（人触发、合并前、可 `--gate strict` 非零退出）。
+- **提醒闸口** = `Stop` hook（`hooks/dsh-spec-gate.py`）：会话级 warn-only、零退出——v2 不改钩子，review 轴不接 Stop 提醒，**任何形态都不 PreToolUse 硬阻断**。
 
-### v1 不接入 `tdd`（测试不变量轴留 v2）
+与 rot 的分工：rot 管运行态退化（warn-only 恒零退出），review 轴管新改动设计态（人触发可 strict）；test 轴与 rot `tests` 查正交，types 轴与 rot `--check types` 正交（仅共用工具链探测）。
 
-测试不变量是六大支柱之一、明确列为 v2 范围（地图 Notes / Out of scope）。v1 的评审/预推闸门**只覆盖两件事**：`code-review` 标准评审 + 逐改动 note/ADR 审计。本命令与 `Stop` hook 均**不调用 `tdd`**；未来若加「测试不变量」轴，可新增 `--axis test` 复用 `tdd`，不在本次落地。
+向后兼容：`--axis code,notes` 精确复现 v1 行为（两轴评审 + note 审计 + 同一 `--gate` 语义）。
