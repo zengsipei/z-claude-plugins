@@ -15,10 +15,10 @@
 | --- | --- | --- |
 | `/dsh-spec-init [--root .] [--force]` | 在新项目里搭好活文档和台账 | skill `dsh-spec-init` |
 | `/dsh-spec-note "<slug>"` | 记一笔改动（feature / bug-fix / ...） | skill `dsh-spec-note` |
-| `/dsh-spec-review [--since <ref>] [--gate strict|warn]` | 合并前闸门：跑评审 + 查笔记缺口 | skill `dsh-spec-review` |
-| `/dsh-spec-rot [--check all|docs|notes|tests|adr]` | 定期体检：文档漂没漂、漏没漏笔记 | skill `dsh-spec-rot` |
+| `/dsh-spec-review [--since <ref>] [--gate strict|warn] [--axis <all|code|notes|test|types>]` | 合并前闸门：多轴评审（code 标准评审 / notes 台账审计 / test seam 测试审计 / types 类型退化审计）；`--axis` 默认 `all` 四轴全跑、支持逗号组合；`--gate strict` 任意轴缺口即阻断、`warn` 仅提醒 | skill `dsh-spec-review`（准则内化，零外部技能依赖） |
+| `/dsh-spec-rot [--check all|docs|notes|tests|adr|simplify|types]` | 定期体检（六查）：docs 文档漂移 / notes 无 note 的 commit / tests 测试退化 / adr ADR 过期 / simplify 复杂度增长 / types 类型退化；恒 warn-only、零退出、只报告不修复 | skill `dsh-spec-rot` |
 
-命令只负责「接参数、叫 skill」，真正的活都在同名 skill 里。评审复用本仓库已有的 `code-review` skill，不重造。
+命令只负责「接参数、叫 skill」，真正的活都在同名 skill 里。评审准则内化于 `dsh-spec-review`（零外部技能依赖），外部 `code-review` 在场仅可选增强，绝不重造。
 
 ## 装到你的项目后，会长这样
 
@@ -61,7 +61,8 @@ claude --plugin-dir <本仓库根>/dsh-spec
 - ✅ 评审 / 预推闸门（D3 #18 落地）：**分层双闸**——
   - **权威闸口** `/dsh-spec-review --gate strict`：人触发，合并前跑，缺笔记就阻断。
   - **提醒闸口** `hooks/dsh-spec-gate.py`：会话结束（Stop）时若工作树有改动却没笔记，向 stderr 提醒，**不阻断**。
-- ⏳ 留 v2：多项目复用、dsh-spec 自己吃狗粮、rot 检查项细化、测试不变量支柱。
+- ✅ v2 三大支柱落地（B1 #34 / B2 #35 / B3 #36）：评审多轴（code/notes/test/types）+ rot 六查（docs/notes/tests/adr/simplify/types，自包含层 + 工具增强层双层信号）；评审准则全内化、零外部技能依赖；复用本仓 `code-review` 仅可选增强。
+- ⏳ 留待：多项目复用、dsh-spec 自己吃狗粮（须开新项目，非本仓）。
 
 ## 目录结构（本插件内）
 
