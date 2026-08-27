@@ -9,17 +9,17 @@ description: 合并前闸门——多轴评审：code（Standards/Spec 标准评
 
 ## 参数
 
-- `--since <ref>`：审计起点，默认上次 merge base（如 `$(git merge-base HEAD origin/main)` 或最近一次 merge commit）。**code/notes/test/types 四轴共用同一固定审计窗口**。
+- `--since <ref>`：审计起点，默认上次 merge base（如 `$(git merge-base HEAD origin/main)` 或最近一次 merge commit）。**四轴（枚举见 §11）共用同一固定审计窗口**。
 - `--gate <strict|warn>`：默认 `strict`。**对所有选中轴统一生效**：strict 下任意轴有缺口即报错、非零退出、阻断合并决定（人仍拍板）；warn 仅列缺口提醒、零退出。
-- `--axis <all|code|notes|test|types>`：评审轴选择，默认 `all` = `code,notes,test,types`。支持逗号组合（如 `--axis code,notes` = 精确复现 v1 行为，未就绪团队以此退出新轴）。枚举之外任何值（含组合中的非法元素）→ 报错退出，不静默降级、不猜测意图。
+- `--axis <枚举>`：评审轴选择，枚举、默认值与固定顺序见 `.agents/RULES.md` §11。支持逗号组合（如 `--axis code,notes` = 精确复现 v1 行为，未就绪团队以此退出新轴）。枚举之外任何值（含组合中的非法元素）→ 报错退出，不静默降级、不猜测意图。
 
 ## 步骤
 
-1. 解析参数：`--since`（默认上次 merge base）、`--gate`（默认 strict）、`--axis`（默认 all，逗号拆分后逐项校验枚举 {code, notes, test, types}）。
+1. 解析参数：`--since`（默认上次 merge base）、`--gate`（默认 strict）、`--axis`（默认值与枚举见 `.agents/RULES.md` §11，逗号拆分后逐项校验）。
    - 完成判定：三个参数已确定且合法；非法 `--axis` 已报错退出。
 2. 解析固定审计窗口：确认 `--since` 可解析（`git rev-parse`）、`git diff <since>...HEAD` 非空。坏 ref 或空 diff 在此失败，不进入各轴。
    - 完成判定：diff 命令与 commit 清单（`git log <since>..HEAD --oneline`）已取得。
-3. 按 `code → notes → test → types` 顺序执行选中轴（每轴独立产出「缺口清单 / 跳过标注」，互不污染；跳过的轴零缺口）：
+3. 按 `.agents/RULES.md` §11 固定顺序执行选中轴（每轴独立产出「缺口清单 / 跳过标注」，互不污染；跳过的轴零缺口）：
    - 完成判定：每个选中轴已产出结论（通过 / 缺口清单 / 跳过标注）。
 4. 按 `--gate` 统一处置：strict 下任意轴缺口非零退出；warn 零退出。汇总给出单一结论（通过 / 阻断）+ 各轴一行摘要。
    - 完成判定：用户拿到单一结论。
@@ -107,8 +107,8 @@ description: 合并前闸门——多轴评审：code（Standards/Spec 标准评
 只审计与闸门。触发位置两层（D3 #18，v2 不变）：
 
 - **权威闸口** = 本命令（人触发、合并前、可 `--gate strict` 非零退出）。
-- **提醒闸口** = `Stop` hook（`hooks/dsh-spec-gate.py`）：会话级提醒，恒受 `.agents/RULES.md` §8 宪法约束（warn-only、零退出、绝不 PreToolUse）——review 轴不接 Stop 提醒。
+- **提醒闸口** = `Stop` hook（`hooks/dsh-spec-gate.py`）：会话级提醒，恒受 `.agents/RULES.md` §8 宪法约束——review 轴不接 Stop 提醒。
 
-与 rot 的分工：rot 管运行态退化（恒受 §8 约束、恒零退出），review 轴管新改动设计态（人触发可 strict）；test 轴与 rot `tests` 查正交，types 轴与 rot `--check types` 正交（仅共用工具链探测）。
+与 rot 的分工：rot 管运行态退化（恒受 §8 约束），review 轴管新改动设计态（人触发可 strict）；test 轴与 rot `tests` 查正交，types 轴与 rot `--check types` 正交（仅共用工具链探测）。
 
 向后兼容：`--axis code,notes` 精确复现 v1 行为（两轴评审 + note 审计 + 同一 `--gate` 语义）。

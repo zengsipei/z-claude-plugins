@@ -1,21 +1,21 @@
 ---
 name: dsh-spec-rot
-description: 漂移与一致性巡检——六查：docs（文档漂移）、notes（无 note 的 commit）、tests（测试退化）、adr（ADR 过期）、simplify（复杂度增长）、types（类型退化）。当用户说「巡检」「漂移检查」「rot 检查」，或按时/随 Stop 钩子触发时调用。恒 warn-only、零退出、只报告不自动修复。
+description: 漂移与一致性巡检——六查：docs（文档漂移）、notes（无 note 的 commit）、tests（测试退化）、adr（ADR 过期）、simplify（复杂度增长）、types（类型退化）。当用户说「巡检」「漂移检查」「rot 检查」，或按时/随 Stop 钩子触发时调用。规范约束见 `.agents/RULES.md` §8。
 ---
 
 # dsh-spec-rot
 
-及早暴露腐烂，便于低成本修复。只报告，不自动修复。本技能恒受 `.agents/RULES.md` §8 warn-only 宪法约束（恒零退出、绝不 PreToolUse、跳过是一等非致命结果）；随 v1 既有 Stop 钩子（`hooks/dsh-spec-gate.py`）例行运行时钩子语义不变。
+及早暴露腐烂，便于低成本修复。只报告，不自动修复。本技能恒受 `.agents/RULES.md` §8 warn-only 宪法约束（全部条款以该节为准，本文件不复述）；随 v1 既有 Stop 钩子（`hooks/dsh-spec-gate.py`）例行运行时钩子语义不变。
 
 ## 参数
 
-- `--check <all|docs|notes|tests|adr|simplify|types>`：默认 `all`（六查全跑）。可多选（逗号分隔，如 `--check docs,simplify`）。枚举之外的任何值（含组合中的非法元素）→ 报参数错误退出——这是唯一的报错退出路径（§8）；任何检查发现本身恒零退出。
+- `--check <枚举>`：枚举、默认值与固定执行顺序见 `.agents/RULES.md` §10。可多选（逗号分隔，如 `--check docs,simplify`）。枚举之外的任何值（含组合中的非法元素）→ 报参数错误退出——§8 唯一报错退出路径。
 - `--simplify-thresholds <k=v,…>`：simplify 查阈值局部覆盖（只覆盖给出的键，其余用默认）。默认值见 `.agents/RULES.md` §6（loc-warn / loc-high / exports）。
 - `--types-thresholds <k=v,…>`：types 查阈值局部覆盖。默认值见 §6（any / non-null / ts-suppression / as-assert；语义：每文件计数**超过**阈值即一条 warn 发现）。
 
 ## 步骤
 
-1. 解析 `--check`（默认 all），展开为检查集合（执行顺序固定：docs → notes → tests → adr → simplify → types）。
+1. 解析 `--check`（默认值与固定执行顺序见 `.agents/RULES.md` §10），展开为检查集合。
    - 完成判定：检查集合已确定；非法 `--check` 值已报错退出。
 2. 对每个选中的检查产出发现。发现 = `{文件, 信号, 度量值, 建议}`；**跳过是一等非致命结果**（输出跳过标注，沿用 v1 `tests`「无测试，跳过」形态，绝不报错、绝不装包）：
    - `docs` / `notes` / `tests` / `adr`：v1 四查，行为不变（定义见下节）。
@@ -23,7 +23,7 @@ description: 漂移与一致性巡检——六查：docs（文档漂移）、not
    - `types`：见「查·types」。
    - 完成判定：每个选中检查要么有发现列表、要么有跳过标注、要么标 ok。
 3. 输出按严重度（高→低）排序的清单，含文件与具体漂移点；对满足 `.agents/RULES.md` §9 候选条件的 note 给出「建议归档」提示（归档协议整体见 §9：人工确认后执行，rot 只建议不动手）。
-   - 完成判定：用户拿到可处理的腐烂报告。**发现再多也零退出**。
+   - 完成判定：用户拿到可处理的腐烂报告。
 
 ## v1 四查（行为不变）
 
@@ -67,4 +67,4 @@ description: 漂移与一致性巡检——六查：docs（文档漂移）、not
 
 ## 范围
 
-只检测与建议，恒受 `.agents/RULES.md` §8 宪法约束（warn-only、零退出；唯一报错退出 = `--check` 非法枚举）。修复走正常改动 + `/dsh-spec-note`。类型退化的合并前把关走 `/dsh-spec-review --axis types`；新改动的测试不变量走 `--axis test`；rot `tests` 查保持 v1 形态不升级。simplify/types 随 v1 既有 Stop 钩子 rot 通道运行（钩子语义不变）。不纳入快照/覆盖率/模块图/字数预算/运行时不变量/自动重构（v2 锁定 Out of scope）。
+只检测与建议，恒受 `.agents/RULES.md` §8 宪法约束。修复走正常改动 + `/dsh-spec-note`。类型退化的合并前把关走 `/dsh-spec-review --axis types`；新改动的测试不变量走 `--axis test`；rot `tests` 查保持 v1 形态不升级。simplify/types 随 v1 既有 Stop 钩子 rot 通道运行（钩子语义不变）。不纳入快照/覆盖率/模块图/字数预算/运行时不变量/自动重构（v2 锁定 Out of scope）。

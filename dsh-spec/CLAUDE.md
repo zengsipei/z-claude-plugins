@@ -5,7 +5,8 @@
 逻辑在同名 skill，命令只做委派。
 
 **全部共享规则（分类 / lifecycle / slug / note 路径与模板 / 阈值 / types 探测链 /
-warn-only 宪法 / 归档协议）的单一事实源是 [`RULES.md`](RULES.md) §1–§9。**
+warn-only 宪法 / 归档协议 / rot 六查与 review 四轴枚举）的单一事实源是
+[`RULES.md`](RULES.md) §1–§11。**
 本文件与其余任何文件只引用、不复述；`/dsh-spec-init` 会把母本复制到消费项目
 `.agents/RULES.md`。
 

@@ -8,7 +8,7 @@
 
 `feature` / `bug-fix` / `simplification` / `architecture` / `process` / `testing`
 
-note 与 LEDGER 的 `<class>` 维度取值即这六个，不加第七类；新类别先改这里。
+note 与 LEDGER 的 `<class>` 维度取值即这六个，不加第七类；新类别先改这里。note 命令 `--class` 默认 `feature`。
 
 ## §2 lifecycle（三态）
 
@@ -32,18 +32,30 @@ kebab-case、纯 ASCII 小写、≤40 字符、禁中文/大写。例：`add-ret
 
 lifecycle 在外、class 在内。归档例外见 §9。
 
-## §5 note 模板必填节
+## §5 note 模板（完整，单一事实源）
 
 ```markdown
 ---
-Status: <proposed|implemented|rejected>
+Status: <proposed|implemented|rejected>   ← 取值即 §2 三态
 ---
 
-## Problem            ← 恒必填
-## Decision | Proposal ← 恒必填（Decision 用于 implemented/rejected；Proposal 用于 proposed）
-## Alternatives considered ← 恒必填（哪怕只列「什么都不做」）
-## Consequences        ← proposed/implemented 必填；rejected 可空
+## Problem
+<改动缘起>                                 ← 恒必填
+
+## Decision
+<改动本身（implemented / rejected 用此节）>
+
+## Proposal
+<改动方案（proposed 用此节）>               ← Decision / Proposal 按 lifecycle 二选一，恒必填
+
+## Alternatives considered
+- <备选 A>：<为何不选>                      ← 恒必填（哪怕只列「什么都不做」）
+
+## Consequences
+<收益或代价>                                ← proposed/implemented 必填；rejected 可空
 ```
+
+frontmatter 除 `Status:` 外唯一允许的其它字段是 `Archived:`（§9 归档协议）。
 
 ## §6 阈值默认值
 
@@ -94,6 +106,18 @@ Status: <proposed|implemented|rejected>
 4. **触发**：由 `/dsh-spec-rot` 对满足条件的 note 给出「建议归档」提示，**人工确认后执行**；`/dsh-spec-note` 与 review 不主动归档。
 
 候选条件（rot 判断用）：Status 为 implemented/rejected 且 LEDGER 日期早于最近一次同类改动。
+
+## §10 rot 六查枚举
+
+`docs` / `notes` / `tests` / `adr` / `simplify` / `types`
+
+rot `--check` 取值即这六个加 `all`（默认，六查全跑）；固定执行顺序 docs → notes → tests → adr → simplify → types。新查先改这里。
+
+## §11 review 四轴枚举
+
+`code` / `notes` / `test` / `types`
+
+review `--axis` 取值即这四个加 `all`（默认，= 四轴全跑）；固定执行顺序 code → notes → test → types。新轴先改这里。
 
 ---
 

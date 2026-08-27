@@ -17,7 +17,7 @@ description: 在项目中脚手架化 dsh-spec 的活文档与变更台账纪律
 1. 解析 `--root`（默认 cwd）。若 `<root>/.agents/notes` 已存在且未传 `--force`，停下并告知 dsh-spec 已初始化，提示用 `--force` 覆盖。
    - 完成判定：目标确认为空白，或用户确认使用 `--force`。
 2. 写 `<root>/.agents/RULES.md`——共享规则单一事实源的副本：把本插件 `dsh-spec/RULES.md` 母本原样复制过去（与 LEDGER.md 种子机制同构）。
-   - 完成判定：副本存在且含 §1–§9 锚点小节。
+   - 完成判定：副本存在且含 §1–§11 锚点小节。
 3. 建目录树：`<root>/.agents/notes/<lifecycle>/<class>/`（lifecycle × class 枚举读上一步副本的 §2 三态 × §1 六类）与 `<root>/docs/adr/`。
    - 完成判定：上述每个目录均存在。
 4. 写 `<root>/SPEC.md`——一页当前规格摘要（产品视角）。用下方「SPEC 模板」原样写入。
