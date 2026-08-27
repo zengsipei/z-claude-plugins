@@ -17,3 +17,6 @@ __pycache__/
 
 # Orca 本地状态
 .orca/
+
+# 设计参考源（deepseek-harness 原仓副本，82MB，不进版本库）
+.dsh-src/
