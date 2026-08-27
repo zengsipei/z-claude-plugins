@@ -71,9 +71,9 @@ feishu-notify/
 │   ├── test_*.py                   # 零网络单测（unittest）
 │   ├── feishu_config.json          # 真实配置（含密钥，已 gitignore）
 │   └── feishu_config.example.json # 配置模板（可提交）
-├── docs/                           # ADR / agents / research
+├── docs/                           # ADR
 ├── skills/                         # 未来放 skills
 ├── commands/                       # 未来放 commands
-├── CLAUDE.md                       # 工程配置入口 + 通用编码准则
+├── CLAUDE.md                       # 插件说明 + 根 AGENTS.md 守则指针
 └── README.md
 ```

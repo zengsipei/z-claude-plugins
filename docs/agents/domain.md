@@ -38,7 +38,7 @@ Multi-context repo (presence of `CONTEXT-MAP.md` at the root):
         └── docs/adr/
 ```
 
-This repo (`z-claude-plugins`) is **single-context**: one root `CONTEXT.md` plus `docs/adr/`. No `CONTEXT-MAP.md`. The repo collocates multiple independent Claude Code plugins (`_template`, `feishu-notify`) but has no shared build/workspace tooling, so it is treated as an aggregate, not a monorepo.
+This repo (`z-claude-plugins`) is **single-context**: one root `CONTEXT.md` plus `docs/adr/`. No `CONTEXT-MAP.md`. The repo collocates multiple independent Claude Code plugins (`_template`, `feishu-notify`, `dsh-spec`) but has no shared build/workspace tooling, so it is treated as an aggregate, not a monorepo.
 
 ## Use the glossary's vocabulary
 
