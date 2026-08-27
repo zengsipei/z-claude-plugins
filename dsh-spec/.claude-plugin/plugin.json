@@ -1,6 +1,6 @@
 {
   "name": "dsh-spec",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "把 deepseek-harness（dsh）的活文档与变更台账纪律——活文档（SPEC.md/ARCHITECTURE.md）+ 变更台账（.agents/notes）+ 评审/预推闸门——移植为 Claude Code 插件，让 agent 在大量 commit 后仍保持 coherent、可追责、不腐烂。",
   "author": {
     "name": "zsp",

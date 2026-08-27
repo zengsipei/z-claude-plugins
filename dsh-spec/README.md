@@ -61,7 +61,7 @@ claude --plugin-dir <本仓库根>/dsh-spec
 - ✅ 脚手架 + 四个命令 / skill（T1 #20 落地）。
 - ✅ 评审 / 预推闸门（D3 #18 落地）：**分层双闸**——
   - **权威闸口** `/dsh-spec-review --gate strict`：人触发，合并前跑，缺笔记就阻断。
-  - **提醒闸口** `hooks/dsh-spec-gate.py`：会话结束（Stop）时若工作树有改动却没笔记，向 stderr 提醒，**不阻断**。
+  - **提醒闸口** `hooks/dsh-spec-gate.py`：会话结束（Stop）时若工作树有未留账改动，向 stderr 提醒，**不阻断**；严格「有账」语义——仅删除或挪走 note/ADR 不算留账（#43）。
 - ✅ v2 三大支柱落地（B1 #34 / B2 #35 / B3 #36）：评审多轴（code/notes/test/types）+ rot 六查（docs/notes/tests/adr/simplify/types，自包含层 + 工具增强层双层信号）；评审准则全内化、零外部技能依赖。
 - ✅ 架构深化（#38）：`RULES.md` 单一事实源 + 命令层纯接口化——共享规则只写一处，命令只做委派。
 - ⏳ 留待：多项目复用、dsh-spec 自己吃狗粮（须开新项目，非本仓）。
