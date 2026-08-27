@@ -11,17 +11,16 @@
   `/dsh-spec-review --gate strict` 命令。
 - 仅做会话级粗检查；逐 commit↔note 精确匹配归 `/dsh-spec-review` 命令。
 - 不调用外部 skill（code-review / tdd）；测试不变量轴留 v2。
-- 仅对已「采纳」dsh-spec 的仓库提醒（存在 `.agents/notes/` 或 `docs/adr/`
-  或根 `SPEC.md`/`ARCHITECTURE.md`），避免打扰未使用该台账的仓库。
+- 仅对已「采纳」dsh-spec 的仓库提醒（存在 `.agents/notes`、`.agents/RULES.md`、
+  `.agents/LEDGER.md` 任一），避免打扰未使用该台账的仓库。
 """
 import os
 import subprocess
 import sys
 
 NOTE_PREFIXES = (".agents/notes/", "docs/adr/")
-# 采纳判定标记：取自 RULES.md「附：脚手架清单」（当前为其中四项子集）。
-# 改脚手架清单须同步评估此常量；改此常量须同步 RULES.md 附录，反之亦然。
-ADOPT_MARKERS = (".agents/notes", "docs/adr", "SPEC.md", "ARCHITECTURE.md")
+# 两组常量的唯一声明处是 RULES.md「附：脚手架清单」，由 hooks/test_dsh_spec_gate.py 一致性测试执法。
+ADOPT_MARKERS = (".agents/notes", ".agents/RULES.md", ".agents/LEDGER.md")
 
 WARNING = (
     "[dsh-spec] 提醒：本轮工作树有改动，但未建 .agents/notes/ 或 docs/adr/ 记录。\n"

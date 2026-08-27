@@ -121,9 +121,9 @@ review `--axis` 取值即这四个加 `all`（默认，= 四轴全跑）；固�
 
 ---
 
-## 附：脚手架清单（hook 采纳判定锚点）
+## 附：脚手架清单
 
-`/dsh-spec-init` 在消费项目生成的结构（`hooks/dsh-spec-gate.py` 中 `ADOPT_MARKERS` 从本清单取值作采纳判定，当前为其中四项子集；改本清单须同步评估 gate.py 常量，反之亦然）：
+`/dsh-spec-init` 在消费项目生成的结构：
 
 - `SPEC.md`
 - `ARCHITECTURE.md`
@@ -131,3 +131,8 @@ review `--axis` 取值即这四个加 `all`（默认，= 四轴全跑）；固�
 - `.agents/notes/`
 - `.agents/LEDGER.md`
 - `.agents/RULES.md`（本文件在消费项目内的副本）
+
+`hooks/dsh-spec-gate.py` 两组常量以下面两行声明为唯一事实源（由 `hooks/test_dsh_spec_gate.py` 一致性测试执法）：
+
+- gate 采纳标记（`ADOPT_MARKERS`）：`.agents/notes` / `.agents/RULES.md` / `.agents/LEDGER.md`
+- 留账路径（`NOTE_PREFIXES`）：`.agents/notes/` / `docs/adr/`

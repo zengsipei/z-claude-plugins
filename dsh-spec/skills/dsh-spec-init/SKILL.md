@@ -39,7 +39,7 @@ description: 在项目中脚手架化 dsh-spec 的活文档与变更台账纪律
 
 本技能只脚手架结构与空白文档骨架。note 内容由 `/dsh-spec-note` 负责，note 模板与 LEDGER 格式由 D2 (#17) 定义，ADR 编号规则（顺序 `0001+`）由 D4 (#19) 定义。
 
-脚手架结构清单的镜像锚点是 `RULES.md` 附录「脚手架清单」——`hooks/dsh-spec-gate.py` 的 `ADOPT_MARKERS` 亦从该清单取值。改脚手架结构须同步 RULES.md 附录与 gate.py 常量，反之亦然。
+脚手架结构清单的镜像锚点是 `RULES.md` 附录「脚手架清单」。
 
 ---
 
