@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/dsh-spec-gate.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/dsh-spec-gate.py\" || python \"${CLAUDE_PLUGIN_ROOT}/hooks/dsh-spec-gate.py\" || py \"${CLAUDE_PLUGIN_ROOT}/hooks/dsh-spec-gate.py\"",
             "timeout": 5
           }
         ]

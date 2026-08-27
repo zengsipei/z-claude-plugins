@@ -9,24 +9,19 @@ description: 把一次非平凡改动记入变更台账，生成 .agents/notes/<
 
 ## 参数
 
-- `"<slug>"`：位置参数，kebab-case、纯 ASCII 小写、去空格与停用词、≤40 字符、禁中文/大写。例：`add-retry-backoff`。
-- `--class <feature|bug-fix|simplification|architecture|process|testing>`：默认 `feature`。
-- `--lifecycle <proposed|implemented|rejected>`：默认 `implemented`；计划阶段用 `proposed`。
+- `"<slug>"`：位置参数，约束见 `.agents/RULES.md` §3（例：`add-retry-backoff`）。
+- `--class <class>`：默认 `feature`；枚举读 `.agents/RULES.md` §1。
+- `--lifecycle <lifecycle>`：默认与语义见 `.agents/RULES.md` §2。
 - `--no-edit`：跳过 `$EDITOR` 补全，直接生成骨架等用户填。
 
 ## 步骤
 
-1. 解析 `<slug>`、`--class`、`--lifecycle`（默认 feature / implemented）。
-   - 完成判定：slug、class、lifecycle 已确定；slug 满足 kebab-case ASCII≤40 约束，否则提示重命名。
-2. 取 `<date>` 为今天（YYYY-MM-DD），拼出路径 `.agents/notes/<lifecycle>/<class>/<date>-<slug>.md`（lifecycle 在 class 在外）。若父目录不存在则创建。
+1. 解析 `<slug>`、`--class`（默认 feature）、`--lifecycle`（默认值见 `.agents/RULES.md` §2）。
+   - 完成判定：slug、class、lifecycle 已确定；slug 通过 `.agents/RULES.md` §3 约束校验，不合格提示重命名、不静默修正。
+2. 取 `<date>` 为今天（YYYY-MM-DD），按 `.agents/RULES.md` §4 的路径模式拼出 note 路径（lifecycle 在外、class 在内）。若父目录不存在则创建。
    - 完成判定：目标路径已确定且目录就绪。
-3. 写入 note，frontmatter + 正文五段（模板见下）。以下章节须全部填实：
-   - `Status: <lifecycle>`（frontmatter 唯一字段）
-   - `## Problem`（必填）——改动缘起。
-   - `## Decision`（implemented/rejected）或 `## Proposal`（proposed）（必填）——改动本身。
-   - `## Alternatives considered`（**必填**，哪怕只列「什么都不做」）——至少一条被否决的备选及其落选原因。
-   - `## Consequences`（仅 implemented）——收益或代价。
-   - 完成判定：文件存在且每节有内容；`## Alternatives considered` 非空。
+3. 写入 note（用下方「note 模板」落盘）。frontmatter 与必填节规则以 `.agents/RULES.md` §5 为准；frontmatter 除 `Status:` 外唯一允许的其它字段是 `Archived:`（§9 归档协议）。
+   - 完成判定：文件存在，§5 列明的必填节均填实。
 4. 若设了 `$EDITOR` 且未传 `--no-edit`，打开该文件由用户补全；否则逐节向用户索取。
    - 完成判定：用户已填实或确认内容。
 5. 在 `.agents/LEDGER.md` 对应 `<class>` 节追加/更新一行（日期倒序）：
@@ -35,7 +30,7 @@ description: 把一次非平凡改动记入变更台账，生成 .agents/notes/<
 
 ## 范围
 
-只负责记录。评审由 `/dsh-spec-review` 负责，归档（v1）由 `/dsh-spec-rot` 建议 + 人工确认执行（沿用 `archived/<class>/` + `Archived:` 头，proposed/implemented/rejected 三态整体迁入）。
+只负责记录。评审由 `/dsh-spec-review` 负责，归档由 `/dsh-spec-rot` 建议、人工确认执行——归档协议整体见 `.agents/RULES.md` §9。
 
 ---
 
@@ -60,5 +55,5 @@ Status: <proposed|implemented|rejected>
 - <备选 B>：<为何不选>
 
 ## Consequences
-<收益或代价（仅 implemented）>
+<收益或代价——必填与否按 `.agents/RULES.md` §5 裁定>
 ```

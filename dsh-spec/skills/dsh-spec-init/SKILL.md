@@ -16,26 +16,30 @@ description: 在项目中脚手架化 dsh-spec 的活文档与变更台账纪律
 
 1. 解析 `--root`（默认 cwd）。若 `<root>/.agents/notes` 已存在且未传 `--force`，停下并告知 dsh-spec 已初始化，提示用 `--force` 覆盖。
    - 完成判定：目标确认为空白，或用户确认使用 `--force`。
-2. 建目录树：`<root>/.agents/notes/{proposed,implemented,rejected}/{feature,bug-fix,simplification,architecture,process,testing}/` 与 `<root>/docs/adr/`。
+2. 写 `<root>/.agents/RULES.md`——共享规则单一事实源的副本：把本插件 `dsh-spec/RULES.md` 母本原样复制过去（与 LEDGER.md 种子机制同构）。
+   - 完成判定：副本存在且含 §1–§9 锚点小节。
+3. 建目录树：`<root>/.agents/notes/<lifecycle>/<class>/`（lifecycle × class 枚举读上一步副本的 §2 三态 × §1 六类）与 `<root>/docs/adr/`。
    - 完成判定：上述每个目录均存在。
-3. 写 `<root>/SPEC.md`——一页当前规格摘要（产品视角）。用下方「SPEC 模板」原样写入。
+4. 写 `<root>/SPEC.md`——一页当前规格摘要（产品视角）。用下方「SPEC 模板」原样写入。
    - 完成判定：文件存在且含可扩展的项目摘要，顶部带活文档提示。
-4. 写 `<root>/ARCHITECTURE.md`——改前必读文档，开头明写「⚠️ 改动前先读本文」。用下方「ARCHITECTURE 模板」原样写入。
+5. 写 `<root>/ARCHITECTURE.md`——改前必读文档，开头明写「⚠️ 改动前先读本文」。用下方「ARCHITECTURE 模板」原样写入。
    - 完成判定：文件存在且带「先读」强提示。
-5. 写 `<root>/docs/adr/0000-template.md`——ADR 模板。用下方「ADR 模板」原样写入。
+6. 写 `<root>/docs/adr/0000-template.md`——ADR 模板。用下方「ADR 模板」原样写入。
    - 完成判定：模板文件存在。
-6. 写 `<root>/.agents/LEDGER.md`——变更台账索引，以本插件 `dsh-spec/LEDGER.md` 种子文件为模板（六类分节 + 顶部说明）。
+7. 写 `<root>/.agents/LEDGER.md`——变更台账索引，以本插件 `dsh-spec/LEDGER.md` 种子文件为模板（六类分节 + 顶部说明）。
    - 完成判定：索引存在并按六类分节。
-7. 在 `<root>/CLAUDE.md` 追加规则块（若存在则 merge，不覆盖已有内容；不存在则新建）。规则块见下方「CLAUDE.md 规则块」。
+8. 在 `<root>/CLAUDE.md` 追加规则块（若存在则 merge，不覆盖已有内容；不存在则新建）。规则块见下方「CLAUDE.md 规则块」。
    - 完成判定：项目 CLAUDE.md 含 dsh-spec 纪律块。
 
 ## 产出
 
-列出所有创建/修改的文件；指引用户用 `/dsh-spec-note` 记录每次非平凡改动，用 `/dsh-spec-review` 合并前闸门，用 `/dsh-spec-rot` 定期巡检。
+列出所有创建/修改的文件（含 `.agents/RULES.md` 副本）；指引用户用 `/dsh-spec-note` 记录每次非平凡改动，用 `/dsh-spec-review` 合并前闸门，用 `/dsh-spec-rot` 定期巡检。
 
 ## 范围
 
 本技能只脚手架结构与空白文档骨架。note 内容由 `/dsh-spec-note` 负责，note 模板与 LEDGER 格式由 D2 (#17) 定义，ADR 编号规则（顺序 `0001+`）由 D4 (#19) 定义。
+
+脚手架结构清单的镜像锚点是 `RULES.md` 附录「脚手架清单」——`hooks/dsh-spec-gate.py` 的 `ADOPT_MARKERS` 亦从该清单取值。改脚手架结构须同步 RULES.md 附录与 gate.py 常量，反之亦然。
 
 ---
 
@@ -126,8 +130,9 @@ Status: <proposed|accepted|superseded-by ADR-00XX|rejected>
 
 ```markdown
 ## 活文档与变更台账纪律（dsh-spec）
+- 共享规则（分类 / lifecycle / slug / 路径 / 模板 / 阈值 / warn-only / 归档）以 `.agents/RULES.md` 为单一事实源。
 - 改动前先读 `ARCHITECTURE.md`；动了结构 / 契约 / 不变量，同步 `SPEC.md` 并补 note/ADR。
-- 每个非平凡改动后跑 `/dsh-spec-note` 留一笔（feature/bug-fix/simplification/architecture/process/testing）。
+- 每个非平凡改动后跑 `/dsh-spec-note` 留一笔。
 - 合并前跑 `/dsh-spec-review`（无 note 不合并）。
 - 定期 `/dsh-spec-rot` 巡检漂移。
 - 术语以 `SPEC.md` 术语表为准。

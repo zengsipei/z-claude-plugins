@@ -19,6 +19,8 @@ import subprocess
 import sys
 
 NOTE_PREFIXES = (".agents/notes/", "docs/adr/")
+# 采纳判定标记：取自 RULES.md「附：脚手架清单」（当前为其中四项子集）。
+# 改脚手架清单须同步评估此常量；改此常量须同步 RULES.md 附录，反之亦然。
 ADOPT_MARKERS = (".agents/notes", "docs/adr", "SPEC.md", "ARCHITECTURE.md")
 
 WARNING = (

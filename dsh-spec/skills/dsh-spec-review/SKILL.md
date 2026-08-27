@@ -94,18 +94,9 @@ description: 合并前闸门——多轴评审：code（Standards/Spec 标准评
 
 仅 TS/JS 仓适用（审计窗口或仓内存在 `.ts`/`.tsx`/`.js`/`.jsx`/`.mjs`/`.cjs`）；非 TS/JS 仓标注「非 TS/JS，跳过」、本轴零缺口。
 
-**工具链探测**（探测一次；与 `dsh-spec-rot --check types` 共用同一逻辑，同一仓结论一致）：
+**工具链探测**（探测一次）：按 `.agents/RULES.md` §7 执行。与 `dsh-spec-rot --check types` 共用同一 §7 链，同一仓结论一致。
 
-1. **首选复用消费项目既有 linter**（零新增依赖）：按序检测 `tsconfig.json`（strict）→ `biome.json` → eslint 配置（`eslint.config.*`/`.eslintrc*`）→ `package.json` 的 `lint` 脚本，命中即直接调用。
-2. TS 风味但无显式配置：回退链 `tsc --strict --noEmit` → `biome check` → `eslint`，取首个**本地已可用**者；只探测、**绝不装包**。
-3. 全无 → 标注「无类型工具链，跳过」（跳过的是工具增强层；自包含层照跑）。
-
-**自包含层**（零依赖恒可跑）：对 `git diff <since>...HEAD` 的新增行（仅 TS/JS 文件）grep 以下类型气味并计数：
-
-- 显式 `any`（含 `as any`、`as unknown as`）
-- 非空断言 `obj!.prop`、`foo!`
-- `@ts-ignore` / `@ts-expect-error`
-- `as` 类型断言（强转气味）
+**自包含层**（零依赖恒可跑）：对 `git diff <since>...HEAD` 的新增行（仅 TS/JS 文件）按 §7 气味清单 grep 计数；计数口径见 §6 review 轴。
 
 **工具增强层**（有工具链才跑）：运行探测到的工具，取**改动文件**中的类型严格度错误，报告具体文件与错误点。
 
@@ -116,8 +107,8 @@ description: 合并前闸门——多轴评审：code（Standards/Spec 标准评
 只审计与闸门。触发位置两层（D3 #18，v2 不变）：
 
 - **权威闸口** = 本命令（人触发、合并前、可 `--gate strict` 非零退出）。
-- **提醒闸口** = `Stop` hook（`hooks/dsh-spec-gate.py`）：会话级 warn-only、零退出——v2 不改钩子，review 轴不接 Stop 提醒，**任何形态都不 PreToolUse 硬阻断**。
+- **提醒闸口** = `Stop` hook（`hooks/dsh-spec-gate.py`）：会话级提醒，恒受 `.agents/RULES.md` §8 宪法约束（warn-only、零退出、绝不 PreToolUse）——review 轴不接 Stop 提醒。
 
-与 rot 的分工：rot 管运行态退化（warn-only 恒零退出），review 轴管新改动设计态（人触发可 strict）；test 轴与 rot `tests` 查正交，types 轴与 rot `--check types` 正交（仅共用工具链探测）。
+与 rot 的分工：rot 管运行态退化（恒受 §8 约束、恒零退出），review 轴管新改动设计态（人触发可 strict）；test 轴与 rot `tests` 查正交，types 轴与 rot `--check types` 正交（仅共用工具链探测）。
 
 向后兼容：`--axis code,notes` 精确复现 v1 行为（两轴评审 + note 审计 + 同一 `--gate` 语义）。
