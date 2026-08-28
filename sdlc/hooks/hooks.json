@@ -2,11 +2,11 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "",
+        "matcher": "startup|resume|clear|compact|fork",
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/cc_session_start.ps1\"",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"[Console]::In.ReadToEnd() | & '${CLAUDE_PLUGIN_ROOT}/hooks/cc_session_start.ps1'\"",
             "timeout": 10
           }
         ]
