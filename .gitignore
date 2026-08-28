@@ -20,3 +20,7 @@ __pycache__/
 
 # 设计参考源（deepseek-harness 原仓副本，82MB，不进版本库）
 .dsh-src/
+
+# 起草区：议题草稿、调研笔记、上游快照副本（含嵌套 .git，重快照时做 diff 用）
+# 保留在本地，不进版本库 —— 别删，里面的 upstream-prompt/ 是判定内核/适配面的基准
+.scratch/
