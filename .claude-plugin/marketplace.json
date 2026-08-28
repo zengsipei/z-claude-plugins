@@ -17,6 +17,13 @@
       "description": "把 deepseek-harness 的活文档与变更台账纪律移植为 Claude Code 插件：活文档 + 变更台账 + 评审/预推闸门，防止大量 commit 后代码腐化。",
       "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/dsh-spec",
       "category": "engineering"
+    },
+    {
+      "name": "sdlc",
+      "source": "./sdlc",
+      "description": "把上游 software-dev-process 的软件开发生命周期纪律移植为 Claude Code 插件：文档先行、对抗性 grill 定稿、确定性阶段门禁与跨会话 AI 登记续接，一条命令安装、开箱即用。",
+      "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/sdlc",
+      "category": "engineering"
     }
   ]
 }

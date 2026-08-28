@@ -1,0 +1,348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:software-dev-process:task-state:v3",
+  "title": "SDLC Task State",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "task_id",
+    "system",
+    "title",
+    "task_dir",
+    "workflow",
+    "phase",
+    "state",
+    "document_state",
+    "progress",
+    "open_items",
+    "blockers",
+    "phase_evidence",
+    "execution",
+    "test",
+    "review",
+    "close",
+    "debug_mode",
+    "script",
+    "branch",
+    "return_phase",
+    "return_context",
+    "debug_outcome",
+    "revision",
+    "created_at",
+    "updated_at",
+    "migration"
+  ],
+  "properties": {
+    "schema_version": {"const": 3},
+    "task_id": {"type": "string", "minLength": 1},
+    "system": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "task_dir": {"type": "string", "minLength": 1},
+    "workflow": {"enum": ["standard", "debug", "script"]},
+    "phase": {
+      "enum": ["design-1", "design-2", "implement", "test", "debug", "script", "close", "done"]
+    },
+    "state": {
+      "enum": [
+        "in_progress",
+        "awaiting_confirmation",
+        "blocked",
+        "investigating",
+        "root_cause_confirmed",
+        "reviewing",
+        "fixing",
+        "awaiting_verification",
+        "awaiting_approval",
+        "executing",
+        "verified",
+        "rolled_back",
+        "completed",
+        "awaiting_close",
+        "closed"
+      ]
+    },
+    "document_state": {
+      "enum": ["draft", "reviewing", "ready", "final", "complete"]
+    },
+    "progress": {"type": "integer", "minimum": 0, "maximum": 100},
+    "open_items": {"type": "integer", "minimum": 0},
+    "blockers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "phase_evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "execution": {
+      "type": "object",
+      "required": ["tasks", "completed_task_ids", "next_task_id"],
+      "properties": {
+        "tasks": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["status", "evidence", "updated_at"],
+            "properties": {
+              "status": {"enum": ["planned", "in_progress", "completed", "blocked"]},
+              "evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "updated_at": {"type": "string", "minLength": 1}
+            },
+            "allOf": [
+              {
+                "if": {"properties": {"status": {"const": "completed"}}},
+                "then": {"properties": {"evidence": {"minItems": 1}}}
+              }
+            ]
+          }
+        },
+        "completed_task_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "next_task_id": {"type": ["string", "null"]}
+      }
+    },
+    "test": {
+      "type": "object",
+      "required": ["state", "evidence", "risk_accepted"],
+      "properties": {
+        "state": {
+          "enum": ["not_started", "running", "passed", "conditional", "failed", "skipped_confirmed", "unknown"]
+        },
+        "evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "risk_accepted": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"enum": ["passed", "conditional"]}}},
+          "then": {"properties": {"evidence": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"state": {"const": "conditional"}}},
+          "then": {"properties": {"risk_accepted": {"const": true}}}
+        }
+      ]
+    },
+    "review": {
+      "type": "object",
+      "required": ["required", "status", "evidence", "updated_at"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "status": {"enum": ["not_required", "pending", "in_progress", "completed"]},
+        "evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "updated_at": {"type": ["string", "null"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "completed"}}},
+          "then": {"properties": {"evidence": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"required": {"const": true}}},
+          "then": {"properties": {"status": {"not": {"const": "not_required"}}}}
+        },
+        {
+          "if": {"properties": {"required": {"const": false}}},
+          "then": {"properties": {"status": {"not": {"enum": ["pending", "in_progress"]}}}}
+        }
+      ]
+    },
+    "close": {
+      "type": "object",
+      "required": ["state", "confirmation", "closed_at", "artifacts"],
+      "properties": {
+        "state": {"enum": ["open", "awaiting_test_confirmation", "ready", "closed"]},
+        "confirmation": {"type": ["object", "null"]},
+        "closed_at": {"type": ["string", "null"]},
+        "artifacts": {
+          "type": "object",
+          "required": ["summary", "registration", "knowledge"],
+          "properties": {
+            "summary": {"$ref": "#/$defs/summaryArtifact"},
+            "registration": {"$ref": "#/$defs/registrationArtifact"},
+            "knowledge": {"$ref": "#/$defs/knowledgeArtifact"}
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "awaiting_test_confirmation"}}},
+          "then": {"properties": {"confirmation": {"type": "object"}}}
+        }
+      ]
+    },
+    "debug_mode": {"enum": ["diagnose", "fix", "unknown", null]},
+    "script": {
+      "type": "object",
+      "required": ["risk", "environment", "approval", "outcome"],
+      "properties": {
+        "risk": {"enum": ["low", "medium", "high", "unknown"]},
+        "environment": {"enum": ["local", "test", "staging", "production", "unknown"]},
+        "approval": {
+          "type": "object",
+          "required": ["required", "approved", "evidence", "approved_at"],
+          "properties": {
+            "required": {"type": "boolean"},
+            "approved": {"type": "boolean"},
+            "evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "approved_at": {"type": ["string", "null"]}
+          },
+          "allOf": [
+            {
+              "if": {"properties": {"approved": {"const": true}}},
+              "then": {
+                "properties": {
+                  "required": {"const": true},
+                  "evidence": {"minItems": 1}
+                }
+              }
+            }
+          ]
+        },
+        "outcome": {"enum": ["verified", "rolled_back", null]}
+      }
+    },
+    "branch": {"type": ["string", "null"]},
+    "return_phase": {"type": ["string", "null"]},
+    "return_context": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": [
+            "phase",
+            "state",
+            "document_state",
+            "progress",
+            "open_items",
+            "blockers",
+            "phase_evidence",
+            "review"
+          ],
+          "properties": {
+            "phase": {
+              "enum": ["design-1", "design-2", "implement", "test", "debug", "script", "close", "done"]
+            },
+            "state": {
+              "enum": [
+                "in_progress",
+                "awaiting_confirmation",
+                "blocked",
+                "investigating",
+                "root_cause_confirmed",
+                "reviewing",
+                "fixing",
+                "awaiting_verification",
+                "awaiting_approval",
+                "executing",
+                "verified",
+                "rolled_back",
+                "completed",
+                "awaiting_close",
+                "closed"
+              ]
+            },
+            "document_state": {
+              "enum": ["draft", "reviewing", "ready", "final", "complete"]
+            },
+            "progress": {"type": "integer", "minimum": 0, "maximum": 100},
+            "open_items": {"type": "integer", "minimum": 0},
+            "blockers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "phase_evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "review": {"$ref": "#/properties/review"}
+          }
+        }
+      ]
+    },
+    "debug_outcome": {"enum": ["diagnosed", "verified", null]},
+    "revision": {"type": "integer", "minimum": 1},
+    "created_at": {"type": "string", "minLength": 1},
+    "updated_at": {"type": "string", "minLength": 1},
+    "migration": {"type": ["object", "null"]}
+  },
+  "$defs": {
+    "artifactBase": {
+      "type": "object",
+      "required": ["status", "evidence", "updated_at"],
+      "properties": {
+        "evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "updated_at": {"type": ["string", "null"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"not": {"const": "pending"}}}},
+          "then": {"properties": {"evidence": {"minItems": 1}}}
+        }
+      ]
+    },
+    "summaryArtifact": {
+      "allOf": [
+        {"$ref": "#/$defs/artifactBase"},
+        {"properties": {"status": {"enum": ["pending", "completed"]}}}
+      ]
+    },
+    "registrationArtifact": {
+      "allOf": [
+        {"$ref": "#/$defs/artifactBase"},
+        {"properties": {"status": {"enum": ["pending", "synced", "skipped", "failed"]}}}
+      ]
+    },
+    "knowledgeArtifact": {
+      "allOf": [
+        {"$ref": "#/$defs/artifactBase"},
+        {"properties": {"status": {"enum": ["pending", "local_only", "synced", "failed"]}}}
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"workflow": {"const": "debug"}}},
+      "then": {"properties": {"phase": {"enum": ["debug", "close", "done"]}}}
+    },
+    {
+      "if": {"properties": {"workflow": {"const": "script"}}},
+      "then": {"properties": {"phase": {"enum": ["script", "close", "done"]}}}
+    },
+    {
+      "if": {"properties": {"phase": {"const": "implement"}}},
+      "then": {
+        "properties": {
+          "review": {"properties": {"required": {"const": true}}}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workflow": {"const": "script"},
+          "script": {"properties": {"risk": {"enum": ["medium", "high"]}}}
+        }
+      },
+      "then": {
+        "properties": {
+          "review": {"properties": {"required": {"const": true}}}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "script": {"properties": {"environment": {"const": "production"}}}
+        }
+      },
+      "then": {
+        "properties": {
+          "script": {
+            "properties": {
+              "approval": {"properties": {"required": {"const": true}}}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "test": {"properties": {"state": {"const": "skipped_confirmed"}}}
+        }
+      },
+      "then": {
+        "properties": {
+          "test": {"properties": {"risk_accepted": {"const": true}}}
+        }
+      }
+    }
+  ]
+}

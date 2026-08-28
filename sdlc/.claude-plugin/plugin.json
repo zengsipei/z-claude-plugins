@@ -1,0 +1,20 @@
+{
+  "name": "sdlc",
+  "version": "0.1.0",
+  "description": "把上游 software-dev-process 的软件开发生命周期纪律移植为 Claude Code 插件：文档先行、对抗性 grill 定稿、确定性阶段门禁与跨会话 AI 登记续接，一条命令安装、开箱即用。",
+  "author": {
+    "name": "zsp",
+    "url": "https://github.com/zengsipei"
+  },
+  "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/sdlc",
+  "repository": "https://github.com/zengsipei/z-claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "sdlc",
+    "workflow",
+    "stage-gate",
+    "task-state",
+    "grill",
+    "session-registration"
+  ]
+}

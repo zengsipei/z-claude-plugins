@@ -1,0 +1,10 @@
+{
+  "backend": "postgresql",
+  "host": "127.0.0.1",
+  "port": 5432,
+  "database": "ai_register",
+  "user": "ai_register",
+  "password": "change-me",
+  "connect_timeout": 3,
+  "sslmode": "prefer"
+}
