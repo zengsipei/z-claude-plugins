@@ -1,0 +1,89 @@
+{
+  "upstream": "AtlantisYuki/prompt@7cdfc64588a1a8eb7d338e3f6f717f1c7abcd81",
+  "files": {
+    "assets/ai-register.config.example.json": {
+      "sha256": "7c0167b91c31e658d6d780e17876f54a8c65a5218c1f10400077b5a41cf52219",
+      "category": "kernel"
+    },
+    "assets/Debug排查记录模板.md": {
+      "sha256": "1cc78c2ff314db4382631230a85782b205851233299303021ec1830c1fa26888",
+      "category": "kernel"
+    },
+    "assets/task-state.schema.json": {
+      "sha256": "ba9f3f23bdd1b21c0334df114d5ca5238e7212cb1a3fd64dca4b4db82bb8671d",
+      "category": "kernel"
+    },
+    "assets/待确认模板.md": {
+      "sha256": "297e8f76d034f9d6d4861ab837ad1226f7bf728880873124a5343a6bb969359a",
+      "category": "kernel"
+    },
+    "assets/施工文档模板.md": {
+      "sha256": "45f00a2dc6df603e68728faf997f107828a6729dbc5edd63b74534bf02159400",
+      "category": "kernel"
+    },
+    "assets/测试文档模板.md": {
+      "sha256": "aaa5f3c1cde3e651c0ef3038d2841fd74e61a0de0b0c8d4f4590df2a2240b6f4",
+      "category": "kernel"
+    },
+    "assets/脚本任务模板.md": {
+      "sha256": "fa6bf5899cb155efb9a5f821810a2c948296d938636320959aa09f26ec101f3f",
+      "category": "kernel"
+    },
+    "assets/设计文档模板.md": {
+      "sha256": "2247717f681626a3d0187c97173f898e0db1ada2d1b0a2d4f803ef79acb774b6",
+      "category": "kernel"
+    },
+    "references/close.md": {
+      "sha256": "0a466c921c2f92f5c723bb624d7dc35e8b1499f42bf5f2cd9c3cdd12ea41e42a",
+      "category": "kernel"
+    },
+    "references/debug-script.md": {
+      "sha256": "04dbf2a631dabfaa95d34b488631d31b9b95688679817c62ae206f34d3e154d1",
+      "category": "kernel"
+    },
+    "references/delivery.md": {
+      "sha256": "da91831a310357f06c78e9189c938de6b77958970eb9f8f2316db4526d23db15",
+      "category": "kernel"
+    },
+    "references/design.md": {
+      "sha256": "9214727eef8b29fc44f6d8fc3b395600ed873b5d3ea620ae20a2bb03bc560c60",
+      "category": "kernel"
+    },
+    "references/grill-with-docs.md": {
+      "sha256": "629654cc2d9724a3198ed95476ab9fbfe658cb4f4f23d97a5d6b1181d7c998dd",
+      "category": "kernel"
+    },
+    "references/registration.md": {
+      "sha256": "8d3601ab9b3d40b94cb206f17cb3c767b42085e3aeb230462f8af698ea4aac05",
+      "category": "adapted"
+    },
+    "references/solo.md": {
+      "sha256": "6517fdd073761bc948149b5afec8142198830aa692b5ac7b4c87fc86bd69d784",
+      "category": "kernel"
+    },
+    "references/task-state.md": {
+      "sha256": "9c96e32b025681931102a02fd4db9274837752afd0c49d416e2d50809e8c45d4",
+      "category": "kernel"
+    },
+    "scripts/ai_register_core.py": {
+      "sha256": "4dfab0f5c2f405b15c83d33c2f66069fcd748f99fc6ea31e0755d938fad63b65",
+      "category": "kernel"
+    },
+    "scripts/install_codex_hook.ps1": {
+      "sha256": "f84098c2287c5848f6be0ee068bd3d55fd6908d642dfef6c0772373a70559d4d",
+      "category": "kernel"
+    },
+    "scripts/install_grok_hook.ps1": {
+      "sha256": "57c200fd6d163a7adc1569772c8abb21756c516069b9190f55587056537121e5",
+      "category": "kernel"
+    },
+    "scripts/task_state_core.py": {
+      "sha256": "f621b778d6ff8646fe617a86e34d2bbc2d5b87c1a3f006eea39a770d1969c4bb",
+      "category": "kernel"
+    },
+    "SKILL.md": {
+      "sha256": "b5c87d9052a5a6370994b7509071fea9c795d8206f84778e1e0896730129a12d",
+      "category": "adapted"
+    }
+  }
+}
