@@ -39,7 +39,7 @@ python tools/run_tests.py sdlc/tests tools       # 指定目录（相对仓库�
 |---|---|---|
 | `md_backticks` | `section: "§N"` 或 `line_startswith: "…"` | 该行里的反引号内容 |
 | `regex_capture` | `pattern` · `group` · `split` · `expect` | 正则捕获组；`split` 再按分隔符拆；`expect` 数的是**匹配处数**（`"1"` / `"1+"`） |
-| `json_path` | `path`（点分） | 标量或数组 |
+| `json_path` | `path`（点分，支持 `plugins[name=dsh-spec]` 数组选择器） | 标量或数组；选择器按字段值挑数组元素，命中数必须恰好 1，否则该条红 |
 | `json_keys` | `path` · `where` | 某层对象的键集，`where` 按字段过滤 |
 | `py_attr` | `name` · `mode: value\|keys` | 按文件路径加载模块取模块级常量 |
 | `file_text` | — | 整个文件文本，配合 `contains_all` 用 |
@@ -66,3 +66,5 @@ python tools/run_tests.py sdlc/tests tools       # 指定目录（相对仓库�
 2. `git checkout` 还原 → 转绿
 
 不接受「加完就是绿的」作为验收——那说明不了守卫有没有在工作。
+
+写脚本自证（而非肉眼看）时两个坑：**unittest 的 `-v` 结果写 stderr 不写 stdout**；本机 `core.autocrlf=true`，捕获到的行尾是 `\r\n`，正则别直接锚 `$`。

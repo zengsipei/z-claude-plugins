@@ -8,7 +8,8 @@
   md_backticks  {section: "§N"} 或 {line_startswith: "..."} —— 抓反引号内容
   regex_capture {pattern, group, split, expect} —— 正则捕获。split 按分隔符拆开
                 捕获到的串；expect 数的是**匹配处数**（"1" | "1+"），不是拆分后的值数
-  json_path     {path} —— 点分路径，取标量或数组
+  json_path     {path} —— 点分路径，取标量或数组；支持 `plugins[name=dsh-spec]`
+                这样的数组选择器（按字段值挑数组元素，命中数必须恰好 1，否则红）
   json_keys     {path, where} —— 取某层对象的键集，可按 where 过滤
   py_attr       {name, mode: value|keys} —— 按文件路径加载模块取模块级常量
   file_text     {} —— 取整文件文本，配合 contains_all 用
@@ -37,6 +38,8 @@ KINDS = ("md_backticks", "regex_capture", "json_path", "json_keys", "py_attr", "
 RELATIONS = ("eq", "prefix_of", "contains_all")
 
 _ENUM_LINE = re.compile(r"^(`[^`]+`)( / `[^`]+`)*$")
+# 数组选择器：路径里 `plugins[name=dsh-spec]` 这一段——先取键、再按字段值挑元素
+_SELECTOR = re.compile(r"^([A-Za-z0-9_-]+)\[([A-Za-z0-9_-]+)=(.+)\]$")
 
 
 class FactError(Exception):
@@ -123,12 +126,38 @@ def _json_data(text, where):
         raise FactError(f"{where} 不是合法 JSON：{e}")
 
 
+def _select_one(items, sel, path, part, where):
+    """路径里的 `key[field=value]`：按字段值从数组里挑元素。"""
+    field, wanted = sel.group(2), sel.group(3)
+    if not isinstance(items, list):
+        raise FactError(
+            f"{where} 的路径 {path!r} 在 {part!r} 处用了数组选择器，"
+            f"但 {sel.group(1)!r} 是 {type(items).__name__}，不是数组"
+        )
+    hits = [
+        e for e in items
+        if isinstance(e, dict) and str(e.get(field)) == wanted
+    ]
+    # 命中 0 个说明名字写错了、2 个说明写得不唯一——两者都必须红，
+    # 否则「悄悄没选到」会伪装成一致。
+    if len(hits) != 1:
+        raise FactError(
+            f"{where} 的路径 {path!r} 中 {part!r} 期望恰好 1 个元素，"
+            f"实际命中 {len(hits)}"
+        )
+    return hits[0]
+
+
 def _dig(data, path, where):
     cur = data
     for part in path.split("."):
-        if not isinstance(cur, dict) or part not in cur:
+        sel = _SELECTOR.match(part)
+        key = sel.group(1) if sel else part
+        if not isinstance(cur, dict) or key not in cur:
             raise FactError(f"{where} 的路径 {path!r} 不存在（断在 {part!r}）")
-        cur = cur[part]
+        cur = cur[key]
+        if sel:
+            cur = _select_one(cur, sel, path, part, where)
     return cur
 
 

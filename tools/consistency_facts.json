@@ -256,6 +256,48 @@
           "extract": { "kind": "py_attr", "name": "RENDERERS", "mode": "keys" }
         }
       ]
+    },
+    {
+      "name": "plugins.description.sdlc",
+      "note": "插件自述：声明处是插件自己的 plugin.json（安装后直接面向用户），marketplace.json 是市场索引面的副本",
+      "source": {
+        "file": "sdlc/.claude-plugin/plugin.json",
+        "extract": { "kind": "json_path", "path": "description" }
+      },
+      "copies": [
+        {
+          "file": ".claude-plugin/marketplace.json",
+          "extract": { "kind": "json_path", "path": "plugins[name=sdlc].description" }
+        }
+      ]
+    },
+    {
+      "name": "plugins.description.dsh-spec",
+      "note": "同上一组；本条两处措辞曾分叉，却没有任何测试会红",
+      "source": {
+        "file": "dsh-spec/.claude-plugin/plugin.json",
+        "extract": { "kind": "json_path", "path": "description" }
+      },
+      "copies": [
+        {
+          "file": ".claude-plugin/marketplace.json",
+          "extract": { "kind": "json_path", "path": "plugins[name=dsh-spec].description" }
+        }
+      ]
+    },
+    {
+      "name": "plugins.description.feishu-notify",
+      "note": "同上一组",
+      "source": {
+        "file": "feishu-notify/.claude-plugin/plugin.json",
+        "extract": { "kind": "json_path", "path": "description" }
+      },
+      "copies": [
+        {
+          "file": ".claude-plugin/marketplace.json",
+          "extract": { "kind": "json_path", "path": "plugins[name=feishu-notify].description" }
+        }
+      ]
     }
   ]
 }
