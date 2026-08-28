@@ -20,7 +20,6 @@ Claude Code -> 通知（z-claude-plugins 插件，多通道）。
 """
 
 import sys
-import os
 import json
 import time
 
@@ -28,18 +27,7 @@ from feishu_config import load_config, should_notify
 import delivery_rules
 from throttle import is_throttled, mark_sent
 import notifiers as notifier_mod
-
-
-HERE = os.path.dirname(os.path.abspath(__file__))
-LOG_PATH = os.path.join(HERE, "feishu_notify.log")
-
-
-def log(msg):
-    try:
-        with open(LOG_PATH, "a", encoding="utf-8") as f:
-            f.write("[%s] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg))
-    except Exception:
-        pass
+from logutil import log
 
 
 def build_context(payload):

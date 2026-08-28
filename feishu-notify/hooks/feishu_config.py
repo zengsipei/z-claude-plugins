@@ -21,25 +21,17 @@
 
 import os
 import json
-import time
+
+from logutil import log
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(HERE, "feishu_config.json")
-LOG_PATH = os.path.join(HERE, "feishu_notify.log")
 
 # 默认启用事件（候选3，issue #8）：原 3 + 新 SessionStart/SessionEnd 默认开；
 # UserPromptSubmit / PreToolUse / PostToolUse 默认关（避免刷屏），需要时自行加入。
 DEFAULT_ENABLED_EVENTS = [
     "Notification", "Stop", "SubagentStop", "SessionStart", "SessionEnd",
 ]
-
-
-def _log(msg):
-    try:
-        with open(LOG_PATH, "a", encoding="utf-8") as f:
-            f.write("[%s] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg))
-    except Exception:
-        pass
 
 
 def load_config():
@@ -60,7 +52,7 @@ def load_config():
             with open(CONFIG_PATH, "r", encoding="utf-8") as f:
                 cfg.update(json.load(f))
         except Exception as e:
-            _log("读取 feishu_config.json 失败: %r" % e)
+            log("读取 feishu_config.json 失败: %r" % e)
     # 环境变量覆盖
     for k, env in [
         ("app_id", "FEISHU_APP_ID"),

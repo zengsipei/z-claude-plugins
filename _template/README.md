@@ -11,7 +11,8 @@
 - `hooks/` —— hook 脚本（注册见 `hooks/hooks.json`）
 - `skills/` —— skills（`<名字>/SKILL.md`）
 - `commands/` —— 命令（平面 `.md`）
-- `agents/` —— 自定义 agent（可选）
+
+> 可选：`agents/`（自定义 agent）按需自建，模板未预置。
 
 ## 装好后的安装命令
 ```
