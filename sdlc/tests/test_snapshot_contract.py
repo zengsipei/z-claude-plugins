@@ -5,8 +5,10 @@
 （规格 Testing Decisions 已裁定）。测试位于插件顶层 `tests/`，不进
 `skills/sdlc/` 快照目录——保持快照 1:1 映射可核对。
 
-另含 `SnapshotIdentityTest`：钉住快照身份（上游提交号 + 已适配面）与其唯一
-声明处 `snapshot.json` 的一致性，防止同一事实在多份文本里各自漂移。
+快照身份跨文件的一致性（提交号 ↔ README 溯源行 / CLAUDE.md 缩写 / 机器基准，
+已适配面 ↔ 基准 category）**不在这里守** —— 已迁至仓库层的事实守卫
+`tools/consistency_facts.json`（事实名前缀 `sdlc.`）。这里只剩声明处自身的
+格式校验：`upstream_commit` 必须是完整 40 位十六进制。
 
 运行方式：cd sdlc && python -m unittest discover -s tests -v
 """
@@ -14,7 +16,6 @@ import hashlib
 import importlib.util
 import io
 import json
-import re
 import sys
 import tempfile
 import unittest
@@ -26,10 +27,9 @@ SCRIPTS = HERE / ".." / "skills" / "sdlc" / "scripts"
 ASSETS = HERE / ".." / "skills" / "sdlc" / "assets"
 SNAPSHOT = (HERE / ".." / "skills" / "sdlc").resolve()
 BASELINE = HERE / "kernel-baseline.json"
-# 快照身份的唯一声明处；README / CLAUDE.md 里的溯源文字是被本测试钉住的副本。
+# 快照身份的唯一声明处。README / CLAUDE.md 里的溯源文字是它的副本，由仓库层
+# 的事实守卫钉住，不在这里断言。
 IDENTITY = (HERE / ".." / "snapshot.json").resolve()
-README = (HERE / ".." / "README.md").resolve()
-CLAUDE_MD = (HERE / ".." / "CLAUDE.md").resolve()
 
 _REGENERATE = "cd sdlc && python tests/update_baseline.py"
 
@@ -182,12 +182,12 @@ class KernelFrozenTest(unittest.TestCase):
         )
 
 
-class SnapshotIdentityTest(unittest.TestCase):
-    """快照身份的一致性：唯一声明处 `snapshot.json` ⇔ 各处人类文本 ⇔ 基准。
+class SnapshotIdentityFormatTest(unittest.TestCase):
+    """声明处自身的格式校验：提交号必须是完整的 40 位十六进制。
 
-    这里守的是一类已经发生过的错误：提交号在传抄中被截断成 39 位，三处权威
-    （ADR、生成器常量、机器基准）同源同错，唯一正确的那份恰恰是没人管的
-    README。现在提交号只声明一次，其余全是副本，由本测试钉住。
+    守的是一类已经发生过的错误：提交号在传抄中被截断成 39 位，三处权威
+    （ADR、生成器常量、机器基准）同源同错。现在提交号只声明一次，副本由
+    仓库层的事实守卫钉住，这里只管声明处自身写得对不对。
 
     ADR 正文故意不断言——它是已接受决策的历史文本，被测试钉住意味着每次重
     快照都得改历史记录。
@@ -202,81 +202,6 @@ class SnapshotIdentityTest(unittest.TestCase):
         self.assertTrue(
             all(c in "0123456789abcdef" for c in commit),
             f"upstream_commit 含非小写十六进制字符：{commit!r}",
-        )
-
-    def test_readme_provenance_line_matches_identity(self):
-        """README 溯源行精确匹配：仓库与提交号逐字相等，日期只校验格式。
-
-        日期不校验值——重快照时它会变，钉住值等于每次重快照都逼人改日期格式
-        以外的东西。
-        """
-        ident = _identity()
-        pattern = re.compile(
-            r"^- \*\*upstream\*\*: (?P<repo>[^@\s]+)@(?P<sha>[0-9a-f]{40})"
-            r" \((?P<date>\d{4}-\d{2}-\d{2})\)$"
-        )
-        hits = [
-            m for m in (
-                pattern.match(line.strip())
-                for line in README.read_text(encoding="utf-8").splitlines()
-            )
-            if m
-        ]
-        self.assertEqual(
-            1, len(hits),
-            f"{README.name} 里应恰好有一行形如 "
-            "「- **upstream**: <repo>@<40 位提交号> (<YYYY-MM-DD>)」的溯源行，"
-            f"实际匹配到 {len(hits)} 行。",
-        )
-        hit = hits[0]
-        self.assertEqual(
-            ident["upstream_repo"], hit["repo"], "溯源行仓库名与 snapshot.json 不一致"
-        )
-        self.assertEqual(
-            ident["upstream_commit"], hit["sha"], "溯源行提交号与 snapshot.json 不一致"
-        )
-
-    def test_claude_md_abbreviation_is_a_prefix_of_commit(self):
-        """CLAUDE.md 允许写缩写，但必须是 upstream_commit 的前缀（≥7 位）。"""
-        commit = _identity()["upstream_commit"]
-        found = re.findall(
-            r"AtlantisYuki/prompt@([0-9a-f]{7,40})",
-            CLAUDE_MD.read_text(encoding="utf-8"),
-        )
-        self.assertTrue(
-            found,
-            f"{CLAUDE_MD.name} 里找不到「AtlantisYuki/prompt@<缩写>」形式的溯源",
-        )
-        for abbrev in found:
-            self.assertTrue(
-                commit.startswith(abbrev),
-                f"{CLAUDE_MD.name} 里的 {abbrev!r} 不是 upstream_commit 的前缀",
-            )
-
-    def test_baseline_upstream_matches_identity(self):
-        """改了 snapshot.json 却没重生成基准 —— 这条会红。"""
-        ident = _identity()
-        expected = "%s@%s" % (ident["upstream_repo"], ident["upstream_commit"])
-        baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
-        self.assertEqual(
-            expected, baseline["upstream"],
-            f"基准里的 upstream 与 snapshot.json 不一致，重生成基准：{_REGENERATE}",
-        )
-
-    def test_adapted_declaration_matches_baseline_categories(self):
-        """adapted 声明与基准里的 category 必须同步 —— 否则分类静默过期。"""
-        declared = set(_identity()["adapted"])
-        in_baseline = {
-            rel
-            for rel, meta in json.loads(
-                BASELINE.read_text(encoding="utf-8")
-            )["files"].items()
-            if meta["category"] == "adapted"
-        }
-        self.assertEqual(
-            declared, in_baseline,
-            "snapshot.json 的 adapted 与基准里 category=adapted 的文件集合不一致，"
-            f"重生成基准：{_REGENERATE}",
         )
 
 

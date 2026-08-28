@@ -15,11 +15,11 @@ from feishu_config import DEFAULT_ENABLED_EVENTS
 
 class TestRenderersRegistry(unittest.TestCase):
     def test_registered_events_have_renderers(self):
-        for ev in ["Notification", "Stop", "SubagentStop", "UserPromptSubmit"]:
-            self.assertIn(ev, renderers.RENDERERS)
+        # 遍历注册表而不列事件名 —— 事件集本身由事实守卫 `feishu.hook-events`
+        # 钉在 hooks.json 上，这里再抄一份名字就成了第三份副本。
+        for ev, fn in renderers.RENDERERS.items():
             # renderer 只吃 payload，返回 4 元组
-            out = renderers.RENDERERS[ev]({"cwd": "/x/proj"})
-            self.assertEqual(len(out), 4)
+            self.assertEqual(len(fn({"cwd": "/x/proj"})), 4)
 
     def test_unknown_event_uses_fallback(self):
         # 未注册事件走 render_unknown，不抛错、灰底
@@ -33,14 +33,9 @@ class TestRenderersRegistry(unittest.TestCase):
         b = renderers.render_notification({"message": "m"})
         self.assertEqual(a, b)
 
-    # ---- 候选3（issue #8）：8 事件注册 + 默认启用开关 ----
-
-    def test_all_8_events_registered(self):
-        expected = {
-            "Notification", "Stop", "SubagentStop", "UserPromptSubmit",
-            "SessionStart", "SessionEnd", "PreToolUse", "PostToolUse",
-        }
-        self.assertEqual(set(renderers.RENDERERS.keys()), expected)
+    # ---- 候选3（issue #8）：默认启用开关 ----
+    # 「8 个事件是否都注册了」不再在这里硬编码期望集 —— 迁至事实守卫
+    # `feishu.hook-events`（声明处是 hooks.json 的事件键，RENDERERS 是副本）。
 
     def test_default_enabled_opens_session_start_end(self):
         self.assertIn("SessionStart", DEFAULT_ENABLED_EVENTS)

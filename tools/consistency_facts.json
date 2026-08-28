@@ -1,0 +1,166 @@
+{
+  "$comment": "事实清单：一个事实 = 一个声明处 + 若干副本 + 各自的抽取方式。新增一个事实 = 加一条，不改 tools/test_consistency.py。路径相对仓库根。",
+  "facts": [
+    {
+      "name": "dsh-spec.gate-adopt-markers",
+      "note": "gate 采纳标记；声明在 RULES.md 附录，实现在 gate.py",
+      "source": {
+        "file": "dsh-spec/RULES.md",
+        "extract": {
+          "kind": "md_backticks",
+          "line_startswith": "- gate 采纳标记（`ADOPT_MARKERS`）："
+        }
+      },
+      "copies": [
+        {
+          "file": "dsh-spec/hooks/dsh-spec-gate.py",
+          "extract": { "kind": "py_attr", "name": "ADOPT_MARKERS" }
+        }
+      ]
+    },
+    {
+      "name": "dsh-spec.gate-note-prefixes",
+      "note": "gate 留账路径；同上一组，声明在 RULES.md 附录",
+      "source": {
+        "file": "dsh-spec/RULES.md",
+        "extract": {
+          "kind": "md_backticks",
+          "line_startswith": "- 留账路径（`NOTE_PREFIXES`）："
+        }
+      },
+      "copies": [
+        {
+          "file": "dsh-spec/hooks/dsh-spec-gate.py",
+          "extract": { "kind": "py_attr", "name": "NOTE_PREFIXES" }
+        }
+      ]
+    },
+    {
+      "name": "sdlc.upstream-repo-in-readme",
+      "note": "README 溯源行的仓库名是副本，声明处是 snapshot.json",
+      "source": {
+        "file": "sdlc/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_repo" }
+      },
+      "copies": [
+        {
+          "file": "sdlc/README.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "^- \\*\\*upstream\\*\\*: (?P<v>[^@\\s]+)@[0-9a-f]{40}",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "sdlc.upstream-commit-in-readme",
+      "note": "README 溯源行的提交号是副本；历史上三处权威曾同源同错成 39 位",
+      "source": {
+        "file": "sdlc/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "sdlc/README.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "^- \\*\\*upstream\\*\\*: [^@\\s]+@(?P<v>[0-9a-f]{40})",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "sdlc.commit-abbrev-in-claude-md",
+      "note": "CLAUDE.md 允许写缩写，但必须是声明处提交号的前缀",
+      "source": {
+        "file": "sdlc/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "sdlc/CLAUDE.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "AtlantisYuki/prompt@([0-9a-f]{7,40})",
+            "group": 1
+          },
+          "relation": "prefix_of"
+        }
+      ]
+    },
+    {
+      "name": "sdlc.upstream-repo-in-baseline",
+      "note": "kernel-baseline.json 是机器产物，其 upstream 的 @ 前段是副本",
+      "source": {
+        "file": "sdlc/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_repo" }
+      },
+      "copies": [
+        {
+          "file": "sdlc/tests/kernel-baseline.json",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\"upstream\":\\s*\"(?P<v>[^@\"]+)@[0-9a-f]{40}\"",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "sdlc.upstream-commit-in-baseline",
+      "note": "同上一组，@ 后段；改了 snapshot.json 却没重生成基准时这条会红",
+      "source": {
+        "file": "sdlc/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "sdlc/tests/kernel-baseline.json",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\"upstream\":\\s*\"[^@\"]+@(?P<v>[0-9a-f]{40})\"",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "sdlc.adapted-set",
+      "note": "已适配面清单：声明在 snapshot.json，基准里的 category=adapted 是副本",
+      "source": {
+        "file": "sdlc/snapshot.json",
+        "extract": { "kind": "json_path", "path": "adapted" }
+      },
+      "copies": [
+        {
+          "file": "sdlc/tests/kernel-baseline.json",
+          "extract": {
+            "kind": "json_keys",
+            "path": "files",
+            "where": { "category": "adapted" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "feishu.hook-events",
+      "note": "插件监听哪些事件：声明处是对外契约 hooks.json，renderers 必须跟上",
+      "source": {
+        "file": "feishu-notify/hooks/hooks.json",
+        "extract": { "kind": "json_keys", "path": "hooks" }
+      },
+      "copies": [
+        {
+          "file": "feishu-notify/hooks/renderers.py",
+          "extract": { "kind": "py_attr", "name": "RENDERERS", "mode": "keys" }
+        }
+      ]
+    }
+  ]
+}
