@@ -6,7 +6,8 @@
 
 抽取器（六种）：
   md_backticks  {section: "§N"} 或 {line_startswith: "..."} —— 抓反引号内容
-  regex_capture {pattern, group, split, expect} —— 正则捕获，expect: "1" | "1+"
+  regex_capture {pattern, group, split, expect} —— 正则捕获。split 按分隔符拆开
+                捕获到的串；expect 数的是**匹配处数**（"1" | "1+"），不是拆分后的值数
   json_path     {path} —— 点分路径，取标量或数组
   json_keys     {path, where} —— 取某层对象的键集，可按 where 过滤
   py_attr       {name, mode: value|keys} —— 按文件路径加载模块取模块级常量
@@ -96,17 +97,22 @@ def _regex_capture(text, spec):
         raise FactError(f"正则无法编译：{pattern!r}（{e}）")
     group = spec.get("group", 1)
     sep = spec.get("split")
+    # expect 数的是「匹配到几处」，不是 split 之后有几个值 —— 一处的
+    # `[--class a|b|c]` 拆开是 3 个值，但它只该有一处。
+    matches = list(rx.finditer(text))
+    if not matches:
+        raise FactError(f"正则没有匹配到任何值：{pattern!r}")
+    if spec.get("expect", "1+") == "1" and len(matches) != 1:
+        raise FactError(f"期望恰好 1 处匹配，实际 {len(matches)} 处：{pattern!r}")
     values = []
     try:
-        for m in rx.finditer(text):
+        for m in matches:
             raw = m.group(group)
             values.extend(raw.split(sep) if sep else [raw])
     except IndexError as e:
         raise FactError(f"正则取组 {group!r} 失败：{e}")
     if not values:
-        raise FactError(f"正则没有匹配到任何值：{pattern!r}")
-    if spec.get("expect", "1+") == "1" and len(values) != 1:
-        raise FactError(f"期望恰好 1 个值，实际 {len(values)} 个：{values}")
+        raise FactError(f"正则匹配到了但取不到值：{pattern!r}")
     return values
 
 

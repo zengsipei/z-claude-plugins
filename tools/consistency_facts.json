@@ -36,6 +36,101 @@
       ]
     },
     {
+      "name": "dsh-spec.note-classes",
+      "note": "§1 六类：命令面的参数串是机器副本；技能面的描述用 contains_all，不约束措辞（它同时是 agent 的触发面）",
+      "source": {
+        "file": "dsh-spec/RULES.md",
+        "extract": { "kind": "md_backticks", "section": "§1" }
+      },
+      "copies": [
+        {
+          "file": "dsh-spec/commands/dsh-spec-note.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\\[--class ([a-z-]+(?:\\|[a-z-]+)+)\\]",
+            "group": 1,
+            "split": "|",
+            "expect": "1"
+          }
+        },
+        {
+          "file": "dsh-spec/skills/dsh-spec-note/SKILL.md",
+          "extract": { "kind": "file_text" },
+          "relation": "contains_all"
+        }
+      ]
+    },
+    {
+      "name": "dsh-spec.note-lifecycles",
+      "note": "§2 三态：只有命令面一个机器副本，技能面描述里没列这三个值",
+      "source": {
+        "file": "dsh-spec/RULES.md",
+        "extract": { "kind": "md_backticks", "section": "§2" }
+      },
+      "copies": [
+        {
+          "file": "dsh-spec/commands/dsh-spec-note.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\\[--lifecycle ([a-z-]+(?:\\|[a-z-]+)+)\\]",
+            "group": 1,
+            "split": "|",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "dsh-spec.rot-checks",
+      "note": "§10 六查：正则跳过 all（它是「全跑」开关，不是六查之一）",
+      "source": {
+        "file": "dsh-spec/RULES.md",
+        "extract": { "kind": "md_backticks", "section": "§10" }
+      },
+      "copies": [
+        {
+          "file": "dsh-spec/commands/dsh-spec-rot.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\\[--check all\\|([a-z]+(?:\\|[a-z]+)+)\\]",
+            "group": 1,
+            "split": "|",
+            "expect": "1"
+          }
+        },
+        {
+          "file": "dsh-spec/skills/dsh-spec-rot/SKILL.md",
+          "extract": { "kind": "file_text" },
+          "relation": "contains_all"
+        }
+      ]
+    },
+    {
+      "name": "dsh-spec.review-axes",
+      "note": "§11 四轴：命令面写作 [--axis <all|…>]，带尖括号",
+      "source": {
+        "file": "dsh-spec/RULES.md",
+        "extract": { "kind": "md_backticks", "section": "§11" }
+      },
+      "copies": [
+        {
+          "file": "dsh-spec/commands/dsh-spec-review.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\\[--axis <all\\|([a-z]+(?:\\|[a-z]+)+)>\\]",
+            "group": 1,
+            "split": "|",
+            "expect": "1"
+          }
+        },
+        {
+          "file": "dsh-spec/skills/dsh-spec-review/SKILL.md",
+          "extract": { "kind": "file_text" },
+          "relation": "contains_all"
+        }
+      ]
+    },
+    {
       "name": "sdlc.upstream-repo-in-readme",
       "note": "README 溯源行的仓库名是副本，声明处是 snapshot.json",
       "source": {

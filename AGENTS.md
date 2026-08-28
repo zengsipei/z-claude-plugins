@@ -81,3 +81,7 @@ Five canonical triage roles — `needs-triage`, `needs-info`, `ready-for-agent`,
 ### Domain docs
 
 single-context: one root `CONTEXT.md` plus `docs/adr/`; no `CONTEXT-MAP.md`. See `docs/agents/domain.md`.
+
+### Testing
+
+one entry point: `python tools/run_tests.py`. Adding a fact to the consistency guard = one line in `tools/consistency_facts.json`. See `docs/agents/testing.md`.
