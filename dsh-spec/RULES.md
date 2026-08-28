@@ -136,3 +136,5 @@ review `--axis` 取值即这四个加 `all`（默认，= 四轴全跑）；固�
 
 - gate 采纳标记（`ADOPT_MARKERS`）：`.agents/notes` / `.agents/RULES.md` / `.agents/LEDGER.md`
 - 留账路径（`NOTE_PREFIXES`）：`.agents/notes/` / `docs/adr/`
+
+**`docs/adr/` 是留账路径，但不是采纳标记**：只建了 `docs/adr/`、没建 `.agents/` 的仓库，即使写了 ADR 也**不会**收到「本轮有未留账改动」的提醒。这是有意的——`docs/adr/` 太普遍，把它算作采纳会打扰大量与 dsh-spec 无关的仓库。想要提醒，先 `/dsh-spec-init` 建齐 `.agents/` 三件套。

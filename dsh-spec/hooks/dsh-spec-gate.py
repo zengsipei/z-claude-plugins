@@ -16,8 +16,9 @@
 - 不调用外部 skill（code-review / tdd）；测试不变量轴留 v2。
 - 仅对已「采纳」dsh-spec 的仓库提醒（存在 `.agents/notes`、`.agents/RULES.md`、
   `.agents/LEDGER.md` 任一），避免打扰未使用该台账的仓库。
-- 决策纯函数化：porcelain 行解析（XY 状态码、rename 源/目标端拆分）全部
-  藏在 `should_warn` 内，零 IO、零 subprocess；`main()` 只负责 IO 编排。
+- 决策纯函数化：`should_warn` 一次判定完「是否采纳」与「是否有账」——
+  porcelain 行解析（XY 状态码、rename 源/目标端拆分）与采纳判定全部藏在其内，
+  零 IO、零 subprocess；`main()` 只负责 IO 编排（探测标记、跑 git status）。
 """
 import os
 import subprocess
@@ -45,22 +46,19 @@ def find_repo_root(start: str) -> str | None:
         cur = parent
 
 
-def is_adopted(existing_markers) -> bool:
-    """existing_markers：仓库根下实际存在的采纳标记路径（由 main 探测后传入）。"""
-    return bool(existing_markers)
-
-
 def _is_note(path: str) -> bool:
     return any(path == p or path.startswith(p) for p in NOTE_PREFIXES)
 
 
-def should_warn(status_lines, adopted: bool) -> bool:
-    """纯决策：给定 porcelain 行与是否采纳，判定是否打提醒。
+def should_warn(status_lines, existing_markers) -> bool:
+    """纯决策：给定 porcelain 行与仓库里实际存在的采纳标记，判定是否打提醒。
+
+    existing_markers 为空即未采纳，静默放行。
 
     严格「有账」语义：A/M/C、rename 目标端、`??` 未跟踪的 note/ADR 路径算
     留账；仅 D（删除）与仅 rename 源端（账被挪走）不算。
     """
-    if not adopted:
+    if not existing_markers:
         return False
     has_changes = False
     has_note = False
@@ -89,8 +87,11 @@ def main() -> int:
         if root is None:
             return 0  # 非 git 仓库：静默放行。
         existing = [m for m in ADOPT_MARKERS if os.path.exists(os.path.join(root, m))]
-        if not is_adopted(existing):
-            return 0  # 未采纳 dsh-spec：静默放行。
+        if not existing:
+            # 性能短路，不是第二条规则：未采纳的仓库不必为一个注定静默的结果付
+            # git status 的代价（-uall 会遍历全部未跟踪文件，大仓上可达秒级）。
+            # 「未采纳即静默」这条规则只声明在 should_warn 里，并由其测试守住。
+            return 0
 
         proc = subprocess.run(
             ["git", "-C", root, "status", "--porcelain", "--untracked-files=all"],
@@ -99,7 +100,7 @@ def main() -> int:
         if proc.returncode != 0:
             return 0  # 无法读取状态：放行，不阻断。
 
-        if should_warn(proc.stdout.splitlines(), adopted=True):
+        if should_warn(proc.stdout.splitlines(), existing):
             sys.stderr.write(WARNING)
         return 0
     except Exception:
