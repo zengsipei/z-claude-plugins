@@ -1,0 +1,8 @@
+{
+  "upstream_repo": "AtlantisYuki/prompt",
+  "upstream_commit": "7cdfc64588a1a8eb7d338e3f6f717f1c7dabcd81",
+  "adapted": [
+    "SKILL.md",
+    "references/registration.md"
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "upstream": "AtlantisYuki/prompt@7cdfc64588a1a8eb7d338e3f6f717f1c7abcd81",
+  "upstream": "AtlantisYuki/prompt@7cdfc64588a1a8eb7d338e3f6f717f1c7dabcd81",
   "files": {
     "assets/ai-register.config.example.json": {
       "sha256": "7c0167b91c31e658d6d780e17876f54a8c65a5218c1f10400077b5a41cf52219",
