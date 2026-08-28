@@ -11,6 +11,29 @@
 /plugin install sdlc@z-claude-plugins
 ```
 
+## 怎么用（入口词）
+
+sdlc 没有命令面：装好后，在对话里说出入口词（或直接说要干哪个阶段的活），就会进入对应流程。
+
+| 入口词 | 干嘛 |
+| --- | --- |
+| `sdlc-design-1` / `sdlc-design-2` | 分层写设计文档，对抗性 grill 到定稿 |
+| `sdlc-implement` / `sdlc-test` | 按设计施工 / 测试 |
+| `sdlc-solo` | 标准流程一条龙跑到测试完，自动收尾 |
+| `sdlc-debug` / `sdlc-script` | 独立排查 Bug / 执行脚本（只在你显式点名时才触发） |
+| `sdlc-close` | 校验关闭门禁后收口 |
+| `sdlc-history` | 登记 / 查历史会话 |
+
+大图景：
+
+```
+会话开始 ─▶ SessionStart 钩子注入 sessionId（跨会话续接的身份证）
+   ▼
+design-1/2：文档先行 + grill 定稿 ─▶ implement ─▶ test
+   ▼
+close：过门禁才收口；产物全部落在 docs/[需求目录]/
+```
+
 ## 快照溯源与许可
 
 - **upstream**: AtlantisYuki/prompt@7cdfc64588a1a8eb7d338e3f6f717f1c7dabcd81 (2026-07-22)

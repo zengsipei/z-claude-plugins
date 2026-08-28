@@ -2,6 +2,10 @@
 
 > 这是一个**插件脚手架**。复制它、改个名、填好配置，你就有一个新插件的起点。
 
+```
+cp -r _template my-plugin ─▶ 填 plugin.json ─▶ 加进 marketplace.json ─▶ 上架完成
+```
+
 ## 怎么用它造一个新插件
 1. 复制目录：`cp -r _template my-plugin`，把 `my-plugin` 改成你的名字。
 2. 填 `my-plugin/.claude-plugin/plugin.json`（名字、版本、描述等）。

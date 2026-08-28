@@ -20,6 +20,14 @@
 
 命令只负责「接参数、叫 skill」：参数签名的权威说明在各命令 description 与同名 skill；全部共享规则（分类、lifecycle、slug、路径、模板、阈值、warn-only、归档）的单一事实源是 [`RULES.md`](RULES.md)，`/dsh-spec-init` 会把它复制到你的项目 `.agents/RULES.md`。
 
+## 两道闸门（防偷懒的机关）
+
+```
+你的改动
+  ├─ 会话结束时 ─▶ 提醒闸口（Stop 钩子）：「有改动没留账哦」──只提醒，不拦人
+  └─ 合并前 ─────▶ 权威闸口（/dsh-spec-review）：缺笔记 = 不放行
+```
+
 ## 装到你的项目后，会长这样
 
 ```

@@ -2,11 +2,16 @@
 
 > 一句话：这是你自己的「Claude 插件商店」。装好这个市场，就能一键安装里面的小工具。
 
-这是一个 **插件市场仓库（monorepo）**。把它想成：
-- **根目录** = 商店目录（`marketplace.json` 列出所有插件）。
-- **每个子目录** = 一个插件（如 `feishu-notify/`），自带配置和说明。
+这是一个 **插件市场仓库（monorepo）**，像一家小商店：
 
-加新插件很简单：复制 `_template`、填好配置、在 `marketplace.json` 里加一条即可，互不干扰。
+```
+这个仓库 = 商店
+  ├── 货架：.claude-plugin/marketplace.json（列出所有插件）
+  └── 商品：每个子目录一个插件，自带配置和说明，互不干扰
+```
+
+装它只要两步：把商店加进 Claude，再从货架装走插件（见下）。
+加新插件也一样简单：复制 `_template`、填好配置、在 `marketplace.json` 里加一条。
 
 ## 里面有什么
 
@@ -14,6 +19,7 @@
 | --- | --- | --- |
 | [`feishu-notify`](./feishu-notify) | Claude 干活时，通过飞书给你发通知卡片 | productivity |
 | [`dsh-spec`](./dsh-spec) | 给项目做活文档 + 变更台账 + 评审闸门，防代码腐化 | engineering |
+| [`sdlc`](./sdlc) | 把软件开发生命周期纪律搬进 Claude Code：文档先行、grill 定稿、阶段门禁、跨会话续接 | engineering |
 
 ## 怎么用（两步）
 
@@ -27,6 +33,7 @@
 ```
 /plugin install feishu-notify@z-claude-plugins
 /plugin install dsh-spec@z-claude-plugins
+/plugin install sdlc@z-claude-plugins
 ```
 
 ### 想本地先试（不发布也能用）
@@ -59,6 +66,7 @@ z-claude-plugins/
 ├── .claude-plugin/marketplace.json   # 市场清单（name + plugins 列表）
 ├── feishu-notify/                    # 插件 1
 ├── dsh-spec/                         # 插件 2
+├── sdlc/                             # 插件 3
 ├── _template/                        # 新插件脚手架（不安装）
 ├── LICENSE
 └── README.md                         # 本文件
