@@ -11,6 +11,8 @@ python tools/run_tests.py sdlc/tests tools       # 指定目录（相对仓库�
 
 失败退出码非零。四个默认目录：`sdlc/tests` · `dsh-spec/hooks` · `feishu-notify/hooks` · `tools`。
 
+CI（`.github/workflows/ci.yml`，`ubuntu-latest`）跑的就是上面第一条命令，退出码非零即红——workflow 里不再逐个目录抄一遍跑法。
+
 **`python -m unittest discover` 从仓库根跑会得到 0 个测试**——三个插件的测试目录都不是包，Python 3.13 的 discover 不再支持命名空间包，先插 `sys.path` 也无效。所以 `run_tests.py` 逐目录 discover，每个目录的 `top_level_dir` 指自己。不要试图改回单条根级 discover 命令。
 
 各测试文件头部的旧跑法（`cd hooks && python -m unittest …`）仍然可用，但**不是权威**——权威只有上面这条。

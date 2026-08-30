@@ -1,0 +1,22 @@
+# 全仓唯一的 CI 检查：跑统一测试入口。
+#
+# 入口刻意只有 `tools/run_tests.py` 一条命令——三个插件的测试目录都不是包，
+# 从仓库根 `python -m unittest discover` 会得到 0 个测试，跑法必须逐目录
+# discover（理由见 tools/run_tests.py 与 docs/agents/testing.md）。在这里
+# 逐个目录抄一遍命令，等于入口统一了、CI 又分叉一次。
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: 跑全仓测试
+        run: python tools/run_tests.py
