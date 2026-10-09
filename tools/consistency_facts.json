@@ -336,6 +336,133 @@
           "extract": { "kind": "json_path", "path": "plugins[name=feishu-notify].description" }
         }
       ]
+    },
+    {
+      "name": "pstack.upstream-repo-in-readme",
+      "note": "README 溯源行的仓库名是副本，声明处是 snapshot.json",
+      "source": {
+        "file": "pstack/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_repo" }
+      },
+      "copies": [
+        {
+          "file": "pstack/README.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "^- \\*\\*upstream\\*\\*: (?P<v>[^@\\s]+)@[0-9a-f]{40}",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pstack.upstream-commit-in-readme",
+      "note": "README 溯源行的提交号是副本；括号里的日期只校验格式不校验值，重快照时值会变",
+      "source": {
+        "file": "pstack/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "pstack/README.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "^- \\*\\*upstream\\*\\*: [^@\\s]+@(?P<v>[0-9a-f]{40})",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pstack.commit-abbrev-in-claude-md",
+      "note": "CLAUDE.md 允许写缩写，但必须是声明处提交号的前缀",
+      "source": {
+        "file": "pstack/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "pstack/CLAUDE.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "cursor/plugins@([0-9a-f]{7,40})",
+            "group": 1
+          },
+          "relation": "prefix_of"
+        }
+      ]
+    },
+    {
+      "name": "pstack.upstream-repo-in-baseline",
+      "note": "kernel-baseline.json 是机器产物，其 upstream 的 @ 前段是副本",
+      "source": {
+        "file": "pstack/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_repo" }
+      },
+      "copies": [
+        {
+          "file": "pstack/tests/kernel-baseline.json",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\\\"upstream\\\":\\s*\\\"(?P<v>[^@\\\"]+)@[0-9a-f]{40}\\\"",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pstack.upstream-commit-in-baseline",
+      "note": "同上一组，@ 后段；改了 snapshot.json 却没重生成基准时这条会红",
+      "source": {
+        "file": "pstack/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "pstack/tests/kernel-baseline.json",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\\\"upstream\\\":\\s*\\\"[^@\\\"]+@(?P<v>[0-9a-f]{40})\\\"",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pstack.adapted-set",
+      "note": "已适配面清单：声明在 snapshot.json，基准里的 category=adapted 是副本",
+      "source": {
+        "file": "pstack/snapshot.json",
+        "extract": { "kind": "json_path", "path": "adapted" }
+      },
+      "copies": [
+        {
+          "file": "pstack/tests/kernel-baseline.json",
+          "extract": {
+            "kind": "json_keys",
+            "path": "files",
+            "where": { "category": "adapted" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "plugins.description.pstack",
+      "note": "插件自述：声明处是插件自己的 plugin.json（安装后直接面向用户），marketplace.json 是市场索引面的副本",
+      "source": {
+        "file": "pstack/.claude-plugin/plugin.json",
+        "extract": { "kind": "json_path", "path": "description" }
+      },
+      "copies": [
+        {
+          "file": ".claude-plugin/marketplace.json",
+          "extract": { "kind": "json_path", "path": "plugins[name=pstack].description" }
+        }
+      ]
     }
   ]
 }

@@ -1,11 +1,11 @@
 """全仓统一测试入口。
 
-三个插件的测试目录都不是包，`python -m unittest discover` 从仓库根跑会得到
+四个插件的测试目录都不是包，`python -m unittest discover` 从仓库根跑会得到
 **0 个测试**（Python 3.13 的 discover 不再支持命名空间包；先插 sys.path 也没用）。
 所以逐目录 discover，每个目录的 top_level_dir 指自己。
 
 跑法：
-    python tools/run_tests.py          全部四个目录
+    python tools/run_tests.py          全部五个目录
     python tools/run_tests.py sdlc/tests tools   指定目录（相对仓库根）
 
 失败退出码非零，便于接 CI。
@@ -15,7 +15,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TARGETS = ("sdlc/tests", "dsh-spec/hooks", "feishu-notify/hooks", "tools")
+TARGETS = ("sdlc/tests", "dsh-spec/hooks", "feishu-notify/hooks", "pstack/tests", "tools")
 
 
 def main(argv=None):

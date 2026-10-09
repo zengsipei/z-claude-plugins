@@ -20,6 +20,7 @@
 | [`feishu-notify`](./feishu-notify) | Claude 干活时，通过飞书给你发通知卡片 | productivity |
 | [`dsh-spec`](./dsh-spec) | 给项目做活文档 + 变更台账 + 评审闸门，防代码腐化 | engineering |
 | [`sdlc`](./sdlc) | 把软件开发生命周期纪律搬进 Claude Code：文档先行、grill 定稿、阶段门禁、跨会话续接 | engineering |
+| [`pstack`](./pstack) | Cursor 官方 pstack 的快照移植：poteto 严谨 agent 工作流（playbook 路由、原则体系、审查泳道） | engineering |
 
 ## 怎么用（两步）
 
@@ -34,6 +35,7 @@
 /plugin install feishu-notify@z-claude-plugins
 /plugin install dsh-spec@z-claude-plugins
 /plugin install sdlc@z-claude-plugins
+/plugin install pstack@z-claude-plugins
 ```
 
 ### 想本地先试（不发布也能用）
@@ -67,6 +69,7 @@ z-claude-plugins/
 ├── feishu-notify/                    # 插件 1
 ├── dsh-spec/                         # 插件 2
 ├── sdlc/                             # 插件 3
+├── pstack/                           # 插件 4
 ├── _template/                        # 新插件脚手架（不安装）
 ├── LICENSE
 └── README.md                         # 本文件

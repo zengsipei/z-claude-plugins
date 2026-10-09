@@ -24,6 +24,13 @@
       "description": "把上游 software-dev-process 的软件开发生命周期纪律移植为 Claude Code 插件：文档先行、对抗性 grill 定稿、确定性阶段门禁与跨会话 AI 登记续接，一条命令安装、开箱即用。",
       "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/sdlc",
       "category": "engineering"
+    },
+    {
+      "name": "pstack",
+      "source": "./pstack",
+      "description": "把 Cursor 官方 pstack 插件（poteto-mode 严谨 agent 工作流：playbook 路由、原则体系、审查泳道）移植为 Claude Code 插件，快照字节冻结、装后即用。",
+      "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/pstack",
+      "category": "engineering"
     }
   ]
 }
