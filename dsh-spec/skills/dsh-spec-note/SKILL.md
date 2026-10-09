@@ -1,11 +1,11 @@
 ---
 name: dsh-spec-note
-description: 把一次非平凡改动记入变更台账，生成 .agents/notes/<lifecycle>/<class>/<date>-<slug>.md。当用户说「记一笔」「加 note」「留账」，或完成 feature/bug-fix/simplification/architecture/process/testing 改动时调用。
+description: 把一次改动记入变更台账，生成 .agents/notes/<lifecycle>/<class>/<date>-<slug>.md。当用户说「记一笔」「加 note」「留账」，或完成 feature/bug-fix/simplification/architecture/process/testing 类改动、且该改动过了留账门槛（RULES.md §12）时调用。
 ---
 
 # dsh-spec-note
 
-每个非平凡改动对应一条 note，保证项目可追责、可回溯。
+门槛内的改动对应一条 note，保证项目可追责、可回溯。门槛判据见 `.agents/RULES.md` §12（留账门槛）——**先过门槛，再写 note**。
 
 ## 参数
 
@@ -30,7 +30,7 @@ description: 把一次非平凡改动记入变更台账，生成 .agents/notes/<
 
 ## 范围
 
-只负责记录。评审由 `/dsh-spec-review` 负责，归档由 `/dsh-spec-rot` 建议、人工确认执行——归档协议整体见 `.agents/RULES.md` §9。
+只负责记录。评审由 `/dsh-spec-review` 负责；归档与删除由 `/dsh-spec-rot` 建议、人工确认执行——协议整体见 `.agents/RULES.md` §9。
 
 ---
 

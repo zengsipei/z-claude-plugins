@@ -1,5 +1,5 @@
 ---
-description: 把一次非平凡改动记入变更台账，生成 .agents/notes/<lifecycle>/<class>/<date>-<slug>.md。参数："<slug>" [--class feature|bug-fix|simplification|architecture|process|testing] [--lifecycle proposed|implemented|rejected] [--no-edit]
+description: 把一次改动记入变更台账，生成 .agents/notes/<lifecycle>/<class>/<date>-<slug>.md。是否必须留账见 RULES.md §12。参数："<slug>" [--class feature|bug-fix|simplification|architecture|process|testing] [--lifecycle proposed|implemented|rejected] [--no-edit]
 allowed-tools: Read, Write, Edit, Bash
 ---
 

@@ -131,6 +131,44 @@
       ]
     },
     {
+      "name": "dsh-spec.upstream-repo-in-readme",
+      "note": "README 溯源行的仓库名是副本，声明处是 snapshot.json",
+      "source": {
+        "file": "dsh-spec/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_repo" }
+      },
+      "copies": [
+        {
+          "file": "dsh-spec/README.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "^- \\*\\*upstream\\*\\*: (?P<v>[^@\\s]+)@[0-9a-f]{40}",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "dsh-spec.upstream-commit-in-readme",
+      "note": "README 溯源行的提交号是副本；括号里的日期只校验格式不校验值，重快照时值会变",
+      "source": {
+        "file": "dsh-spec/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "dsh-spec/README.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "^- \\*\\*upstream\\*\\*: [^@\\s]+@(?P<v>[0-9a-f]{40})",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
       "name": "sdlc.upstream-repo-in-readme",
       "note": "README 溯源行的仓库名是副本，声明处是 snapshot.json",
       "source": {

@@ -59,7 +59,7 @@ claude --plugin-dir <本仓库根>/dsh-spec
 ## 你要遵守的规矩（/dsh-spec-init 会写进项目 CLAUDE.md）
 
 - 改结构 / 契约 / 不变量之前，先读 `ARCHITECTURE.md`。
-- 每次大改动后跑 `/dsh-spec-note` 留一笔。
+- 过了留账门槛的改动（判据见 [`RULES.md` §12](RULES.md)）跑 `/dsh-spec-note` 留一笔。
 - 合并前跑 `/dsh-spec-review`（没笔记不让合）。
 - 定期跑 `/dsh-spec-rot` 体检。
 - 术语以 `SPEC.md` 术语表为准；共享规则以 `.agents/RULES.md` 为准。
@@ -72,7 +72,17 @@ claude --plugin-dir <本仓库根>/dsh-spec
   - **提醒闸口** `hooks/dsh-spec-gate.py`：会话结束（Stop）时若工作树有未留账改动，向 stderr 提醒，**不阻断**；严格「有账」语义——仅删除或挪走 note/ADR 不算留账（#43）。
 - ✅ v2 三大支柱落地（B1 #34 / B2 #35 / B3 #36）：评审多轴（code/notes/test/types）+ rot 六查（docs/notes/tests/adr/simplify/types，自包含层 + 工具增强层双层信号）；评审准则全内化、零外部技能依赖。
 - ✅ 架构深化（#38）：`RULES.md` 单一事实源 + 命令层纯接口化——共享规则只写一处，命令只做委派。
+- ✅ 重快照到 dsh `0.2.1-alpha.1`：回灌上游三条规则变更——
+  - **留账门槛**（新增 §12）：取代此前各处沿用、却从无定义的「非平凡改动」；门槛是「代码/测试/文档都讲不清且具长期价值的决策理由」，机械性与局部 UI 编辑明确豁免。
+  - **删除分支**（§9.2）：仅描述小型 UI 调整或纯机械变更的 implemented note 可直接删（连同 LEDGER 行与入站链接），不再一律归档。
+  - **归档只对 implemented 开放**（§9.1）：纠正旧文档「三态整体迁入 `archived/`」的说法——过时 proposed 先转 rejected。
 - ⏳ 留待：多项目复用、dsh-spec 自己吃狗粮（须开新项目，非本仓）。
+
+## 快照溯源与许可
+
+- **upstream**: deepseek-ai/deepseek-harness@5badb15009ae1756c3afe0ae0cef1faafc290ccc (2026-10-03)
+- 上游以 MIT 许可发布（Copyright (c) 2026 DeepSeek），本插件在移植时保留对其作者 **DeepSeek** 的署名。
+- 本地不留上游副本。快照身份（上游仓库 / 提交 / 适配面）的唯一声明处是 [`snapshot.json`](snapshot.json)，见 [ADR-0002](../../docs/adr/0002-快照身份单一事实源.md)。
 
 ## 目录结构（本插件内）
 
@@ -85,6 +95,7 @@ dsh-spec/
 │   ├── hooks.json   # Stop 钩子注册
 │   └── dsh-spec-gate.py  # warn-only 提醒闸口（已实现）
 ├── RULES.md         # 共享规则单一事实源（/dsh-spec-init 复制到项目 .agents/RULES.md）
+├── snapshot.json    # 快照身份唯一声明处（上游仓库 + 提交 + 适配面）
 ├── LEDGER.md        # 台账索引种子（/dsh-spec-init 复制到项目）
 ├── CLAUDE.md
 └── README.md
