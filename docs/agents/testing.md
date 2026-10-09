@@ -19,7 +19,7 @@ CI（`.github/workflows/ci.yml`，`ubuntu-latest`）跑的就是上面第一条�
 
 ## Add a fact
 
-事实 = 一个在多处被表述的值。**声明处**由人做决定的那一侧承载（对外契约 / 规则文档），**副本**是被它驱动的实现与文档。（术语见 `CONTEXT.md`，边界见 `docs/adr/0003`。）
+事实 = 一个在多处被表述的值。**声明处**由人做决定的那一侧承载（对外契约 / 规则文档），**副本**是被它驱动的实现与文档。（术语见 `GLOSSARY.md`，边界见 `docs/adr/0003`。）
 
 往 `tools/consistency_facts.json` 的 `facts` 数组里加一条，不改 `tools/test_consistency.py`：
 
