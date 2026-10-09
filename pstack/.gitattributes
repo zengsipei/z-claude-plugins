@@ -17,3 +17,7 @@ upstream/** -text
 .cursor-plugin/** -text
 LICENSE -text
 .gitignore -text
+
+# 机器产物：tests/kernel-baseline.json 由 update_baseline.py 生成，标 -text
+# 避免 Windows autocrlf 在生成与提交之间制造假差异。
+tests/kernel-baseline.json -text

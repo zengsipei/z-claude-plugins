@@ -1,0 +1,21 @@
+{
+  "name": "pstack",
+  "version": "0.1.0",
+  "description": "把 Cursor 官方 pstack 插件（poteto-mode 严谨 agent 工作流：playbook 路由、原则体系、审查泳道）移植为 Claude Code 插件，快照字节冻结、装后即用。",
+  "author": {
+    "name": "zsp",
+    "url": "https://github.com/zengsipei"
+  },
+  "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/pstack",
+  "repository": "https://github.com/zengsipei/z-claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "pstack",
+    "poteto-mode",
+    "workflow",
+    "principles",
+    "agent-style",
+    "subagents",
+    "unslop"
+  ]
+}
