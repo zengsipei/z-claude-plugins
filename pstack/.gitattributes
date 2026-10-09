@@ -1,0 +1,19 @@
+# pstack 快照目录：与上游提交 ccb5507 保持字节级 1:1
+# 纪律见仓库根 docs/adr/0001-快照移植纪律.md
+#
+# 禁止 git 对快照内容做任何换行符转换。core.autocrlf=true 的 Windows 环境在
+# checkout / reset / 克隆时会把 LF 改写成 CRLF —— 快照就不再是上游字节的映像，
+# 内核冻结守卫（tests/KernelFrozenTest）也会在干净克隆后立刻误报。
+#
+# 冻结范围 = snapshot.json 的 snapshot_paths 声明（唯一声明处）。本插件其余文件
+# （tests/、README.md、CLAUDE.md、.claude-plugin/、snapshot.json、本文件）
+# 属于可动层，照常走仓库默认换行策略。
+skills/** -text
+agents/** -text
+automations/** -text
+docs/** -text
+assets/** -text
+upstream/** -text
+.cursor-plugin/** -text
+LICENSE -text
+.gitignore -text
