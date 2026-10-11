@@ -1,0 +1,20 @@
+{
+  "name": "team-kit-bridge",
+  "version": "0.1.0",
+  "description": "pstack 无损移植的桥接件：从 cursor/plugins@ccb5507 的 cursor-team-kit 摘取 pstack playbook 点名的三个技能（deslop / control-cli / control-ui），字节冻结、装后即用。",
+  "author": {
+    "name": "zsp",
+    "url": "https://github.com/zengsipei"
+  },
+  "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/team-kit-bridge",
+  "repository": "https://github.com/zengsipei/z-claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "pstack",
+    "cursor-team-kit",
+    "deslop",
+    "control-cli",
+    "control-ui",
+    "bridge"
+  ]
+}

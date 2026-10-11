@@ -1,0 +1,8 @@
+{
+  "upstream_repo": "cursor/plugins",
+  "upstream_commit": "ccb5507cec1546dc88135c1139c811e6c59115ba",
+  "snapshot_paths": [
+    "skills"
+  ],
+  "adapted": []
+}

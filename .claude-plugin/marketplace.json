@@ -31,6 +31,13 @@
       "description": "把 Cursor 官方 pstack 插件（poteto-mode 严谨 agent 工作流：playbook 路由、原则体系、审查泳道）移植为 Claude Code 插件，快照字节冻结、装后即用。",
       "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/pstack",
       "category": "engineering"
+    },
+    {
+      "name": "team-kit-bridge",
+      "source": "./team-kit-bridge",
+      "description": "pstack 无损移植的桥接件：从 cursor/plugins@ccb5507 的 cursor-team-kit 摘取 pstack playbook 点名的三个技能（deslop / control-cli / control-ui），字节冻结、装后即用。",
+      "homepage": "https://github.com/zengsipei/z-claude-plugins/tree/main/team-kit-bridge",
+      "category": "engineering"
     }
   ]
 }

@@ -451,6 +451,132 @@
       ]
     },
     {
+      "name": "pstack.models-config-path",
+      "note": "模型配置文件路径：声明处是 setup-pstack 的 SKILL.md（人决定配置写在哪里）；副本一是读取它的 SessionStart hook 脚本（~/ 前缀在脚本里对应 $HOME），副本二是 CLAUDE.md 的溯源文字",
+      "source": {
+        "file": "pstack/skills/setup-pstack/SKILL.md",
+        "extract": {
+          "kind": "regex_capture",
+          "pattern": "~/(\\.claude/pstack-models\\.md)",
+          "group": 1
+        }
+      },
+      "copies": [
+        {
+          "file": "pstack/hooks/pstack_session_start.ps1",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "Join-Path \\$HOME \"(\\.claude/pstack-models\\.md)\"",
+            "group": 1,
+            "expect": "1"
+          }
+        },
+        {
+          "file": "pstack/CLAUDE.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "~/(\\.claude/pstack-models\\.md)",
+            "group": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "team-kit-bridge.upstream-repo-in-readme",
+      "note": "README 溯源行的仓库名是副本，声明处是 snapshot.json",
+      "source": {
+        "file": "team-kit-bridge/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_repo" }
+      },
+      "copies": [
+        {
+          "file": "team-kit-bridge/README.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "^- \\*\\*upstream\\*\\*: (?P<v>[^@\\s]+)@[0-9a-f]{40}",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "team-kit-bridge.upstream-commit-in-readme",
+      "note": "README 溯源行的提交号是副本；括号里的日期只校验格式不校验值，重快照时值会变",
+      "source": {
+        "file": "team-kit-bridge/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "team-kit-bridge/README.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "^- \\*\\*upstream\\*\\*: [^@\\s]+@(?P<v>[0-9a-f]{40})",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "team-kit-bridge.commit-abbrev-in-claude-md",
+      "note": "CLAUDE.md 允许写缩写，但必须是声明处提交号的前缀",
+      "source": {
+        "file": "team-kit-bridge/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "team-kit-bridge/CLAUDE.md",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "cursor/plugins@([0-9a-f]{7,40})",
+            "group": 1
+          },
+          "relation": "prefix_of"
+        }
+      ]
+    },
+    {
+      "name": "team-kit-bridge.upstream-repo-in-baseline",
+      "note": "kernel-baseline.json 是机器产物，其 upstream 的 @ 前段是副本",
+      "source": {
+        "file": "team-kit-bridge/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_repo" }
+      },
+      "copies": [
+        {
+          "file": "team-kit-bridge/tests/kernel-baseline.json",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\\\"upstream\\\":\\s*\\\"(?P<v>[^@\\\"]+)@[0-9a-f]{40}\\\"",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "team-kit-bridge.upstream-commit-in-baseline",
+      "note": "同上一组，@ 后段；改了 snapshot.json 却没重生成基准时这条会红",
+      "source": {
+        "file": "team-kit-bridge/snapshot.json",
+        "extract": { "kind": "json_path", "path": "upstream_commit" }
+      },
+      "copies": [
+        {
+          "file": "team-kit-bridge/tests/kernel-baseline.json",
+          "extract": {
+            "kind": "regex_capture",
+            "pattern": "\\\"upstream\\\":\\s*\\\"[^@\\\"]+@(?P<v>[0-9a-f]{40})\\\"",
+            "group": "v",
+            "expect": "1"
+          }
+        }
+      ]
+    },
+    {
       "name": "plugins.description.pstack",
       "note": "插件自述：声明处是插件自己的 plugin.json（安装后直接面向用户），marketplace.json 是市场索引面的副本",
       "source": {
@@ -461,6 +587,37 @@
         {
           "file": ".claude-plugin/marketplace.json",
           "extract": { "kind": "json_path", "path": "plugins[name=pstack].description" }
+        }
+      ]
+    },
+    {
+      "name": "plugins.description.team-kit-bridge",
+      "note": "插件自述：声明处是插件自己的 plugin.json（安装后直接面向用户），marketplace.json 是市场索引面的副本",
+      "source": {
+        "file": "team-kit-bridge/.claude-plugin/plugin.json",
+        "extract": { "kind": "json_path", "path": "description" }
+      },
+      "copies": [
+        {
+          "file": ".claude-plugin/marketplace.json",
+          "extract": { "kind": "json_path", "path": "plugins[name=team-kit-bridge].description" }
+        }
+      ]
+    },
+    {
+      "name": "tools.test-dirs",
+      "note": "统一测试入口的默认目录清单：声明处是 docs/agents/testing.md（规则文档，人决定测试入口跑哪些目录），run_tests.py 的 TARGETS 是被它驱动的实现——防止只改一侧（team-kit-bridge 加入时曾只改实现漏改文档）",
+      "source": {
+        "file": "docs/agents/testing.md",
+        "extract": {
+          "kind": "md_backticks",
+          "line_startswith": "六个默认目录："
+        }
+      },
+      "copies": [
+        {
+          "file": "tools/run_tests.py",
+          "extract": { "kind": "py_attr", "name": "TARGETS" }
         }
       ]
     }
