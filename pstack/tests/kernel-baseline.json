@@ -418,8 +418,8 @@
       "category": "kernel"
     },
     "skills/setup-pstack/SKILL.md": {
-      "sha256": "d61b47256a18155a81c8e5ef95e3cc6569ce8c18317c35c4dd9c8015cf68cb59",
-      "category": "kernel"
+      "sha256": "3bbf0f594f367d595f070f453a6e6f82e89f2f88ceb0a22904dd4455cdd8dfdc",
+      "category": "adapted"
     },
     "skills/show-me-your-work/references/decision-log-template.tsv": {
       "sha256": "6779378006a2f5225e8c06deb84f1d913fb532041ebbb6e50d94600bfe3f4b76",

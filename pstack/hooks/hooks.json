@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact|fork",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"[Console]::In.ReadToEnd() | & '${CLAUDE_PLUGIN_ROOT}/hooks/pstack_session_start.ps1'\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

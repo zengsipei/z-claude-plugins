@@ -15,6 +15,7 @@
   "adapted": [
     "agents/comment-sicko.md",
     "skills/no-comments/SKILL.md",
-    "skills/poteto-mode/SKILL.md"
+    "skills/poteto-mode/SKILL.md",
+    "skills/setup-pstack/SKILL.md"
   ]
 }

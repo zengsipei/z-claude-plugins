@@ -18,7 +18,8 @@ Goal-Driven Execution）见仓库根 `AGENTS.md`，不在插件内复述。
 
 - **`snapshot_paths` 之外的一切都是可动层**，自由改。目前这一层有 `tests/` ·
   `README.md` · `CLAUDE.md`（本文件） · `.gitattributes` ·
-  `.claude-plugin/plugin.json` · `snapshot.json`；以后新增的文件自动属于这一层。
+  `.claude-plugin/plugin.json` · `snapshot.json` · `hooks/hooks.json` ·
+  `hooks/pstack_session_start.ps1`；以后新增的文件自动属于这一层。
 - **`snapshot_paths` 声明的九个路径**（`skills/` `agents/` `automations/` `docs/`
   `assets/` `upstream/` `.cursor-plugin/` `LICENSE` `.gitignore`）之内分两类，
   类别记在机器基准里，不靠人记——跑 `python tests/update_baseline.py` 会打印
@@ -38,15 +39,16 @@ Goal-Driven Execution）见仓库根 `AGENTS.md`，不在插件内复述。
 `snapshot_paths` 内的路径在 `.gitattributes` 里标为 `-text`，git 不做换行符
 转换，快照与上游字节级 1:1。
 
-## 已适配面（3 个，理由）
+## 已适配面（4 个，理由）
 
 | 文件 | 改动 | 理由 |
 |---|---|---|
 | `agents/comment-sicko.md` | frontmatter `name: Comment Sicko` → `comment-sicko` | agent 名字必须是可寻址标识符，空格名在 Task `subagent_type` 里不可用 |
 | `skills/no-comments/SKILL.md` | 四处 `Comment Sicko` 引用 → `` `comment-sicko` `` | 跟随上一行的改名，入口面一致性 |
 | `skills/poteto-mode/SKILL.md` | frontmatter `name: Poteto Mode` → `poteto-mode` | skill 名应与目录名一致（kebab-case） |
+| `skills/setup-pstack/SKILL.md` | 配置写入路径 `~/.cursor/rules/pstack-models.mdc` → `~/.claude/pstack-models.md`，删 Cursor 规则 frontmatter（`alwaysApply` 等），注入方式改为本插件 SessionStart hook | Claude Code 没有 Cursor 规则文件机制；配置由 `hooks/pstack_session_start.ps1` 每会话注入 |
 
-三处都是入口与接线面，不动任何 playbook / 原则正文。
+四处都是入口与接线面，不动任何 playbook / 原则正文。
 
 ## 已知遗留（在禁区里，等下次重快照）
 
@@ -58,14 +60,16 @@ Goal-Driven Execution）见仓库根 `AGENTS.md`，不在插件内复述。
   `worktree-cleanup` playbook 引用了 `worktree-audit.sh`（路径仍在，脚本本体可用，
   只是 Windows 下需自行用 bash 跑）。
 - **`cursor-team-kit` 的 `/deslop`、`control-cli`、`control-ui`**：poteto-mode 的
-  若干 playbook 引用它们，那是另一个 Cursor 插件；本仓未装时引用落空，用本仓已有的
-  review 手段替代。
+  若干 playbook 引用它们；已由本仓 `team-kit-bridge` 插件按原名桥接（同一上游
+  仓库的同一提交），与 pstack 一起安装时引用即解析。
 - **Cursor cloud agents / worktree 语义**：`autopilot-*`、`orchestrate`、`shipping`
   等 playbook 提到 `environment: "cloud"` 与 Cursor worktree；Claude Code 的 Task
   工具有自己的 background/cloud 语义，按当下工具能力解释。
-- **`setup-pstack` 写 `~/.cursor/rules/pstack-models.mdc`**：该技能描述的是 Cursor
-  的规则文件路径；在 Claude Code 里对应的模型配置入口不同，技能未适配，仅随快照
-  留存作参考。
+- **内核技能仍引用 `~/.cursor/rules/pstack-models.mdc`**（poteto-help、architect、
+  arena、swarm、interrogate、`docs/guide/` 等）：那是上游原文，保持原字节。
+  该路径现在对应 `setup-pstack` 适配后写入的 `~/.claude/pstack-models.md`
+  （见上表），由 `hooks/pstack_session_start.ps1` 每会话注入，agent 就地按此
+  解释；配置文件不在时各技能回落各自的默认模型。
 - **`docs/guide/` 与 `automations/benny/`**：面向 Cursor 用户的上手指南与自动化
   配置，保留作参考。
 

@@ -32,7 +32,7 @@ IDENTITY = PLUGIN / "snapshot.json"
 
 # 编译产物不进快照核对。
 SKIP_SUFFIXES = (".pyc",)
-SKIP_DIRS = {"__pycache__"}
+SKIP_DIRS = {"__pycache__", "node_modules"}
 
 
 def load_identity() -> tuple[str, list[str], set[str]]:
