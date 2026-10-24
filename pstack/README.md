@@ -2,7 +2,7 @@
 
 > 一句话：把 Cursor 官方 pstack 插件搬进 Claude Code——poteto 的严谨 agent 工作流，少写、写对。
 
-- **upstream**: cursor/plugins@ccb5507cec1546dc88135c1139c811e6c59115ba (2026-10-08)
+- **upstream**: cursor/plugins@e73df471cd4bd918367e99f3dd9c51bd53ddf5f0 (2026-10-23)
 
 本插件是上游 [`cursor/plugins`](https://github.com/cursor/plugins) 仓库 `pstack/`
 目录的快照移植（纪律见仓库根 `docs/adr/0001`）。装上后得到的是上游那一整套
@@ -28,16 +28,18 @@ how / why / architect / arena / interrogate / swarm / unslop 等支撑技能。
 
 | 目录 | 内容 |
 |---|---|
-| `skills/` | 44 个技能：1 个模式入口（poteto-mode）+ 23 个原则叶 + 工作流与工具技能 |
+| `skills/` | 58 个技能：1 个模式入口（poteto-mode）+ 24 个原则叶 + 工作流与工具技能 |
 | `agents/` | 2 个 agent 说明：poteto-agent（poteto 风格路由目标）、comment-sicko（注释洁癖审查员） |
 | `docs/` `automations/` `assets/` | 上游指南、自动化配置、logo，随快照留存作参考 |
 | `upstream/` | 上游 README 原文（为给本文件腾位置而移入，字节未动） |
 
 ## 与上游的差异
 
-只有 3 个文件动过字节（`snapshot.json` 的 `adapted` 清单是唯一声明处）：
-`comment-sicko` 与 `poteto-mode` 两个 frontmatter 名字从带空格改成可寻址的
-kebab-case，`no-comments` 里的引用跟随改名。其余 161 个文件与上游字节级一致，
+只有 1 个文件动过字节（`snapshot.json` 的 `adapted` 清单是唯一声明处）：
+`setup-pstack` 的模型配置写入路径从 Cursor 规则文件改为 `~/.claude/pstack-models.md`
+（删 Cursor 规则 frontmatter，改为本插件 SessionStart hook 注入）。上游 `e73df471`
+已自带 Claude Code 适配并把 `comment-sicko` / `poteto-mode` / `no-comments` 的 name
+规范化，这三个文件已不再需要适配。其余 198 个文件与上游字节级一致，
 由 `tests/` 里的冻结守卫执法。
 
 ## 维护

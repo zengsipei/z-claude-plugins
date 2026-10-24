@@ -1,4 +1,4 @@
-# pstack 快照目录：与上游提交 ccb5507 保持字节级 1:1
+# pstack 快照目录：与上游提交 e73df471 保持字节级 1:1
 # 纪律见仓库根 docs/adr/0001-快照移植纪律.md
 #
 # 禁止 git 对快照内容做任何换行符转换。core.autocrlf=true 的 Windows 环境在

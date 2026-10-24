@@ -1,6 +1,6 @@
 {
   "upstream_repo": "cursor/plugins",
-  "upstream_commit": "ccb5507cec1546dc88135c1139c811e6c59115ba",
+  "upstream_commit": "e73df471cd4bd918367e99f3dd9c51bd53ddf5f0",
   "snapshot_paths": [
     "skills",
     "agents",
@@ -13,9 +13,6 @@
     ".gitignore"
   ],
   "adapted": [
-    "agents/comment-sicko.md",
-    "skills/no-comments/SKILL.md",
-    "skills/poteto-mode/SKILL.md",
     "skills/setup-pstack/SKILL.md"
   ]
 }

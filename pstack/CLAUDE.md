@@ -1,7 +1,7 @@
 # pstack · 插件说明
 
 本插件移植 Cursor 官方 pstack 插件：poteto 的严谨 agent 工作流——`poteto-mode`
-路由 + 23 个 playbook + 23 条原则叶技能 + how/why/architect/arena/interrogate/
+路由 + 23 个 playbook + 24 条原则叶技能 + how/why/architect/arena/interrogate/
 swarm 等工作流技能。安装后，说「/poteto-mode」或「用 poteto 风格做这件事」即可触发；
 入口技能是 `skills/poteto-mode/SKILL.md`，两个 agent 说明在 `agents/`。
 
@@ -10,7 +10,7 @@ Goal-Driven Execution）见仓库根 `AGENTS.md`，不在插件内复述。
 
 ## 快照纪律（动手前必读）
 
-本插件是上游 `cursor/plugins@ccb5507`（2026-10-08）的**快照移植**，不是普通源码
+本插件是上游 `cursor/plugins@e73df471`（2026-10-23）的**快照移植**，不是普通源码
 目录。动任何文件前先判定它属于哪一类；判据与纪律见仓库根
 [`docs/adr/0001-快照移植纪律.md`](../docs/adr/0001-快照移植纪律.md)。
 
@@ -39,16 +39,16 @@ Goal-Driven Execution）见仓库根 `AGENTS.md`，不在插件内复述。
 `snapshot_paths` 内的路径在 `.gitattributes` 里标为 `-text`，git 不做换行符
 转换，快照与上游字节级 1:1。
 
-## 已适配面（4 个，理由）
+## 已适配面（1 个，理由）
 
 | 文件 | 改动 | 理由 |
 |---|---|---|
-| `agents/comment-sicko.md` | frontmatter `name: Comment Sicko` → `comment-sicko` | agent 名字必须是可寻址标识符，空格名在 Task `subagent_type` 里不可用 |
-| `skills/no-comments/SKILL.md` | 四处 `Comment Sicko` 引用 → `` `comment-sicko` `` | 跟随上一行的改名，入口面一致性 |
-| `skills/poteto-mode/SKILL.md` | frontmatter `name: Poteto Mode` → `poteto-mode` | skill 名应与目录名一致（kebab-case） |
 | `skills/setup-pstack/SKILL.md` | 配置写入路径 `~/.cursor/rules/pstack-models.mdc` → `~/.claude/pstack-models.md`，删 Cursor 规则 frontmatter（`alwaysApply` 等），注入方式改为本插件 SessionStart hook | Claude Code 没有 Cursor 规则文件机制；配置由 `hooks/pstack_session_start.ps1` 每会话注入 |
 
-四处都是入口与接线面，不动任何 playbook / 原则正文。
+上游 `e73df471` 已自带 Claude Code 适配（`docs/harness/claude-code.md`），并把
+`comment-sicko` / `poteto-mode` / `no-comments` 的 name 规范化，与本地字节一致，
+故这三个文件不再是适配面。这处是唯一的入口与接线面改动，不动任何 playbook /
+原则正文。
 
 ## 已知遗留（在禁区里，等下次重快照）
 
